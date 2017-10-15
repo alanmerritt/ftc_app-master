@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QCARConfig>
+    <Tracking>
+        <ImageTarget name="Glyph.Front" size="6.000000 6.000000"/>
+        <ImageTarget name="Glyph.Left" size="6.000000 6.000000"/>
+        <ImageTarget name="Glyph.Right" size="6.000000 6.000000"/>
+        <ImageTarget name="Glyph.Bottom" size="6.000000 6.000000"/>
+        <ImageTarget name="Glyph.Top" size="6.000000 6.000000"/>
+        <ImageTarget name="Glyph.Back" size="6.000000 6.000000"/>
+        <MultiTarget name="Glyph">
+            <Part name="Glyph.Left" translation="-3.0 0 0" rotation="AD: 0 1 0 -90"/>
+            <Part name="Glyph.Right" translation="3.0 0 0" rotation="AD: 0 1 0 90"/>
+            <Part name="Glyph.Front" translation="0 0 3.0" rotation="AD: 1 0 0 0"/>
+            <Part name="Glyph.Back" translation="0 0 -3.0" rotation="AD: 0 1 0 180"/>
+            <Part name="Glyph.Top" translation="0 3.0 0" rotation="AD: 1 0 0 -90"/>
+            <Part name="Glyph.Bottom" translation="0 -3.0 0" rotation="AD: 1 0 0 90"/>
+        </MultiTarget>
+    </Tracking>
+</QCARConfig>
