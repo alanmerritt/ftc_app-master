@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.teamcode.calibration.CalibrationManager;
+
 /**
  * Created by MerrittAM on 10/19/2017.
  * TeleOp v.1
@@ -14,152 +16,129 @@ import com.qualcomm.robotcore.util.Range;
 @TeleOp(name = "TeleOp_v1", group = "TeleOp")
 public class TeleOp_v1 extends OpMode {
 	
-    private double liftUpPower = .4;
-    private double liftDownPower = -.4;
-    private final double LIFT_STOP_POWER = 0;
+	private double liftUpPower = .35;
+	private double liftDownPower = -.35;
+	private final double LIFT_STOP_POWER = 0;
 	
-    private double lServoOpen;
-    private double lServoClose;
-    private double rServoOpen;
-    private double rServoClose;
+	private double lServoOpen;
+	private double lServoClose;
+	private double rServoOpen;
+	private double rServoClose;
 	
-    private boolean gripperPressedLast = false;
-    private boolean gripperOn = false;
+	private boolean gripperPressedLast = false;
+	private boolean gripperOn = false;
 	
-    private DcMotor frontLeft;
-    private DcMotor frontRight;
-    private DcMotor backRight;
-    private DcMotor backLeft;
+	private DcMotor frontLeft;
+	private DcMotor frontRight;
+	private DcMotor backRight;
+	private DcMotor backLeft;
 	
-    private DcMotor rightLift;
-    private DcMotor leftLift;
+	private DcMotor rightLift;
+	private DcMotor leftLift;
 	
-    private Servo rightGripper;
-    private Servo leftGripper;
+	private Servo rightGripper;
+	private Servo leftGripper;
 	
 	//Looks like someone can't spell...
-    private final String CALIBRATIOIN_FILEPATH = "/sdcard/FIRST/Calibration.txt";
+	private final String CALIBRATIOIN_FILEPATH = "/sdcard/FIRST/Calibration.txt";
 	
-    @Override
-    public void init() {
+	@Override
+	public void init() {
 
-        frontLeft = hardwareMap.dcMotor.get("fl");
-        frontRight = hardwareMap.dcMotor.get("fr");
-        backRight = hardwareMap.dcMotor.get("br");
-        backLeft = hardwareMap.dcMotor.get("bl");
+		frontLeft = hardwareMap.dcMotor.get("fl");
+		frontRight = hardwareMap.dcMotor.get("fr");
+		backRight = hardwareMap.dcMotor.get("br");
+		backLeft = hardwareMap.dcMotor.get("bl");
+		
+		frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+		frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+		backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+		backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+		
+		frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+		backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+		rightLift = hardwareMap.dcMotor.get("rightLift");
+		leftLift = hardwareMap.dcMotor.get("leftLift");
+		
+		leftLift.setDirection(DcMotorSimple.Direction.REVERSE);
+		
+		leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+		rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+		
+		rightGripper = hardwareMap.servo.get("rightGripper");
+		leftGripper = hardwareMap.servo.get("leftGripper");
+		telemetry.addLine("Hardware mapping complete.");
+		
+		//TODO: Replace data loading with CalibrationManager.
+		
+		CalibrationManager calibrationManager = new CalibrationManager();
+		lServoOpen = Double.parseDouble(calibrationManager.get("lServoOpen"));
+		lServoClose = Double.parseDouble(calibrationManager.get("lServoClose"));
+		rServoOpen = Double.parseDouble(calibrationManager.get("rServoOpen"));
+		rServoClose = Double.parseDouble(calibrationManager.get("rServoClose"));
+		liftUpPower = Double.parseDouble(calibrationManager.get("liftUpPower"));
+		liftDownPower = Double.parseDouble(calibrationManager.get("liftDownPower"));
+		telemetry.addLine("Calibration data loaded.");
+		
+		telemetry.update();
 
-        rightLift = hardwareMap.dcMotor.get("rightLift");
-        leftLift = hardwareMap.dcMotor.get("leftLift");
+	}
 
-        leftLift.setDirection(DcMotorSimple.Direction.REVERSE);
+	@Override
+	public void loop() {
 
-        rightGripper = hardwareMap.servo.get("rightGripper");
-        leftGripper = hardwareMap.servo.get("leftGripper");
-        telemetry.addLine("Hardware mapping complete.");
-        
-        //TODO: Replace data loading with CalibrationManager.
-	    
-	    CalibrationManager calibrationManager = new CalibrationManager();
-	    lServoOpen = Double.parseDouble(calibrationManager.get("lServoOpen"));
-	    lServoClose = Double.parseDouble(calibrationManager.get("lServoClose"));
-	    rServoOpen = Double.parseDouble(calibrationManager.get("rServoOpen"));
-	    rServoClose = Double.parseDouble(calibrationManager.get("rServoClose"));
-        liftUpPower = Double.parseDouble(calibrationManager.get("liftUpPower"));
-        liftDownPower = Double.parseDouble(calibrationManager.get("liftDownPower"));
-	    telemetry.addLine("Calibration data loaded.");
-        
-//        try {
-//
-//            FileInputStream filein = new FileInputStream(CALIBRATIOIN_FILEPATH);
-//            String data = "";
-//
-//            int c;
-//            while((c = filein.read()) != -1) {
-//
-//                data += (char)c;
-//
-//            }
-//
-//            String[] datalist = data.split("\n");
-//
-//            if(datalist.length >= 4) {
-//
-//                lServoOpen = Double.parseDouble(datalist[0]);
-//                lServoClose = Double.parseDouble(datalist[1]);
-//                rServoOpen = Double.parseDouble(datalist[2]);
-//                rServoClose = Double.parseDouble(datalist[3]);
-//
-//            }
-//
-//        } catch(FileNotFoundException e) {
-//            telemetry.addLine("Error: Calibration file not found.");
-//            telemetry.addLine(e.toString());
-//        } catch(IOException e) {
-//            telemetry.addLine("Error: Problem reading file.");
-//            telemetry.addLine(e.toString());
-//        }
+		drive();
+		runLift();
+		runGripper();
 
-        telemetry.update();
+	}
 
-    }
+	private void drive() {
 
-    @Override
-    public void loop() {
+		double x = gamepad1.left_stick_x;
+		double y = gamepad1.left_stick_y;
+		double r = gamepad1.right_stick_x;
 
-        drive();
-        runLift();
-        runGripper();
+		
+		frontLeft.setPower(Range.clip(y - x - r, -1, 1));
+		backLeft.setPower(Range.clip(y + x - r, -1, 1));
+		frontRight.setPower(Range.clip(y + x + r, -1, 1));
+		backRight.setPower(Range.clip(y - x + r, -1, 1));
 
-    }
+	}
 
-    private void drive() {
+	private void runLift() {
 
-        double x = gamepad1.left_stick_x;
-        double y = gamepad1.left_stick_y;
-        double r = gamepad1.right_stick_x;
+		if(gamepad1.right_trigger != 0) {
+			rightLift.setPower(liftUpPower);
+			leftLift.setPower(liftUpPower);
+		} else if(gamepad1.left_trigger != 0) {
+			rightLift.setPower(liftDownPower);
+			leftLift.setPower(liftDownPower);
+		} else {
+			rightLift.setPower(LIFT_STOP_POWER);
+			leftLift.setPower(LIFT_STOP_POWER);
+		}
 
-        //Temporarily reduce speed until we get the 40:1 motors.
-        frontLeft.setPower(Range.clip(y - x - r, -.5, .5));
-        backLeft.setPower(Range.clip(y + x - r, -.5, .5));
-        frontRight.setPower(Range.clip(y + x + r, -.5, .5));
-        backRight.setPower(Range.clip(y - x + r, -.5, .5));
+	}
 
-    }
+	private void runGripper() {
 
-    private void runLift() {
+		if(gamepad1.a && !gripperPressedLast) {
+			gripperOn = !gripperOn;
+		}
 
-        if(gamepad1.right_trigger != 0) {
-            rightLift.setPower(liftUpPower);
-            leftLift.setPower(liftUpPower);
-        } else if(gamepad1.left_trigger != 0) {
-            rightLift.setPower(liftDownPower);
-            leftLift.setPower(liftDownPower);
-        } else {
-            rightLift.setPower(LIFT_STOP_POWER);
-            leftLift.setPower(LIFT_STOP_POWER);
-        }
+		if(gripperOn) {
+			leftGripper.setPosition(lServoClose);
+			rightGripper.setPosition(rServoClose);
+		} else {
+			leftGripper.setPosition(lServoOpen);
+			rightGripper.setPosition(rServoOpen);
+		}
 
-    }
+		gripperPressedLast = gamepad1.a;
 
-    private void runGripper() {
-
-        if(gamepad1.a && !gripperPressedLast) {
-            gripperOn = !gripperOn;
-        }
-
-        if(gripperOn) {
-            leftGripper.setPosition(lServoClose);
-            rightGripper.setPosition(rServoClose);
-        } else {
-            leftGripper.setPosition(lServoOpen);
-            rightGripper.setPosition(rServoOpen);
-        }
-
-        gripperPressedLast = gamepad1.a;
-
-    }
+	}
 
 }
