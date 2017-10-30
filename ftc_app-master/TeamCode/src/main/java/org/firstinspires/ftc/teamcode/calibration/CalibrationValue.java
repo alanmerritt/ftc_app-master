@@ -13,9 +13,14 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  */
 public abstract class CalibrationValue {
 	
-	private Gamepad gamepad;
+	protected Gamepad gamepad;
+	private boolean aPressedFirst = false;
 	private boolean aPressedLast = false;
+	
+	private boolean upPressedFirst = false;
 	private boolean upPressedLast = false;
+	
+	private boolean downPressedFirst = false;
 	private boolean downPressedLast = false;
 	/**The value that will be saved.*/
 	protected double value = 0;
@@ -36,14 +41,14 @@ public abstract class CalibrationValue {
 	/**
 	 * User implementation to save a calibration value.
 	 */
-	public abstract void changeValue();
+	protected abstract void changeValue();
 	
 	/**
 	 * Determines if the dpad up button has been clicked.
 	 * @return Whether or not the button has been clicked.
 	 */
 	public boolean upButtonClicked() {
-		if(gamepad.dpad_up && !upPressedLast) {
+		if(upPressedFirst && !upPressedLast) {
 			return true;
 		}
 		return false;
@@ -54,11 +59,13 @@ public abstract class CalibrationValue {
 	 * @return Whether or not the button has been clicked.
 	 */
 	public boolean downButtonClicked() {
-		if(gamepad.dpad_down && !downPressedLast) {
+		if(downPressedFirst && !downPressedLast) {
 			return true;
 		}
 		return false;
 	}
+	
+	
 	
 	/**
 	 * Runs the user implementation until the a button
@@ -66,22 +73,28 @@ public abstract class CalibrationValue {
 	 * value in the CalibrationManager object parameter.
 	 * @param manager The CalibrationManager object used for saving the value.
 	 */
-	public final void calibrate(CalibrationManager manager, Telemetry t) {
+	public final void calibrate(CalibrationManager manager) {
+		
+		boolean exitLoop = false;
+		
+		value = Double.parseDouble(manager.get(valueName));
 		
 		//Loop until the a button is clicked.
-		while(gamepad.a && !aPressedLast) {
+		while(!exitLoop) {
+			
+			aPressedFirst = gamepad.a;
+			upPressedFirst = gamepad.dpad_up;
+			downPressedFirst = gamepad.dpad_down;
 			
 			//Run user implementation.
 			changeValue();
 			
-			t.addLine("Calibrating.");
-			t.addData("A", gamepad.a);
-			t.addData("A last", !aPressedLast);
+			exitLoop = aPressedFirst && !aPressedLast;
 			
 			//Update click values.
-			aPressedLast = gamepad.a;
-			upPressedLast = gamepad.dpad_up;
-			downPressedLast = gamepad.dpad_down;
+			aPressedLast = aPressedFirst;
+			upPressedLast = upPressedFirst;
+			downPressedLast = downPressedFirst;
 			
 		}
 		

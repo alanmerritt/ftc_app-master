@@ -40,7 +40,7 @@ public class TeleOp_v1 extends OpMode {
 	private Servo leftGripper;
 	
 	//Looks like someone can't spell...
-	private final String CALIBRATIOIN_FILEPATH = "/sdcard/FIRST/Calibration.txt";
+//	private final String CALIBRATIOIN_FILEPATH = "/sdcard/FIRST/Calibration.txt";
 	
 	@Override
 	public void init() {
@@ -54,6 +54,8 @@ public class TeleOp_v1 extends OpMode {
 		frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+		
+		telemetry.addData("Default runmode", frontLeft.getMode());
 		
 		frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 		backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -70,15 +72,13 @@ public class TeleOp_v1 extends OpMode {
 		leftGripper = hardwareMap.servo.get("leftGripper");
 		telemetry.addLine("Hardware mapping complete.");
 		
-		//TODO: Replace data loading with CalibrationManager.
-		
-		CalibrationManager calibrationManager = new CalibrationManager();
+		CalibrationManager calibrationManager = new CalibrationManager(telemetry);
 		lServoOpen = Double.parseDouble(calibrationManager.get("lServoOpen"));
 		lServoClose = Double.parseDouble(calibrationManager.get("lServoClose"));
 		rServoOpen = Double.parseDouble(calibrationManager.get("rServoOpen"));
 		rServoClose = Double.parseDouble(calibrationManager.get("rServoClose"));
-		liftUpPower = Double.parseDouble(calibrationManager.get("liftUpPower"));
-		liftDownPower = Double.parseDouble(calibrationManager.get("liftDownPower"));
+		liftUpPower = -Double.parseDouble(calibrationManager.get("liftPower"));
+		liftDownPower = Double.parseDouble(calibrationManager.get("liftPower"));
 		telemetry.addLine("Calibration data loaded.");
 		
 		telemetry.update();

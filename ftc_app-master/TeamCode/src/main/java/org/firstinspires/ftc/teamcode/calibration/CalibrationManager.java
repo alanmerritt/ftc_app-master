@@ -1,10 +1,11 @@
 package org.firstinspires.ftc.teamcode.calibration;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,11 +21,14 @@ public class CalibrationManager {
 	
 	private HashMap<String, String> data;
 	
+	private Telemetry telemetry;
+	
 	/**
 	 * Initializes the calibration manager.
 	 */
-	public CalibrationManager() {
+	public CalibrationManager(Telemetry telemetry) {
 		
+		this.telemetry = telemetry;
 		data = new HashMap<String, String>();
 		loadData();
 		
@@ -111,11 +115,7 @@ public class CalibrationManager {
 	
 	public void add(String key, String value) {
 		
-		if(!data.containsKey(key)) {
-			
-			data.put(key, value);
-			
-		}
+		data.put(key, value);
 		
 	}
 	
@@ -143,11 +143,18 @@ public class CalibrationManager {
 			
 		} catch (FileNotFoundException ex) {
 			
+			telemetry.addLine("File could not be found.");
+			telemetry.addLine(ex.toString());
+			telemetry.update();
+			
 		} catch (IOException ex) {
+			
+			telemetry.addLine("IO Exception thrown.");
+			telemetry.addLine(ex.toString());
+			telemetry.update();
 			
 		}
 			
 	}
-	//TODO: Add methods for adding and saving data.
 	
 }
