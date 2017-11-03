@@ -20,6 +20,9 @@ public class Calibration extends LinearOpMode {
 		
 		final Servo leftGripper = hardwareMap.servo.get("leftGripper");
 		final Servo rightGripper = hardwareMap.servo.get("rightGripper");
+		final Servo upperRightGripper = hardwareMap.servo.get("upperRightGripper");
+		final Servo upperLeftGripper = hardwareMap.servo.get("upperLeftGripper");
+		
 		final DcMotor leftLift = hardwareMap.dcMotor.get("leftLift");
 		leftLift.setDirection(DcMotorSimple.Direction.REVERSE);
 		leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -30,7 +33,7 @@ public class Calibration extends LinearOpMode {
 		
 		waitForStart();
 		
-		
+		//Lower left servo open.
 		new CalibrationValue(gamepad1, "lServoOpen") {
 			protected void changeValue() {
 				
@@ -53,6 +56,7 @@ public class Calibration extends LinearOpMode {
 		
 		sleep(500);
 		
+		//Lower left servo closed.
 		new CalibrationValue(gamepad1, "lServoClose") {
 			protected void changeValue() {
 
@@ -73,6 +77,7 @@ public class Calibration extends LinearOpMode {
 		
 		sleep(500);
 		
+		//Lower right servo open.
 		new CalibrationValue(gamepad1, "rServoOpen") {
 			protected void changeValue() {
 
@@ -93,6 +98,7 @@ public class Calibration extends LinearOpMode {
 		
 		sleep(500);
 		
+		//Lower right servo closed.
 		new CalibrationValue(gamepad1, "rServoClose") {
 			public void changeValue() {
 
@@ -113,6 +119,103 @@ public class Calibration extends LinearOpMode {
 		
 		sleep(500);
 		
+		// --- Upper Servos ---
+		
+		//Upper left servo open.
+		new CalibrationValue(gamepad1, "upperlServoOpen") {
+			protected void changeValue() {
+				
+				if (upButtonClicked() && value <= 1) {
+					value += 0.05;
+				}
+				if (downButtonClicked() && value >= 0) {
+					value -= 0.05;
+				}
+				
+				upperLeftGripper.setPosition(value);
+				
+				
+				telemetry.addLine("Upper left servo open position.");
+				telemetry.addData("Value", value);
+				telemetry.update();
+				
+			}
+		}.calibrate(manager);
+		
+		sleep(500);
+		
+		//Upper left servo closed.
+		new CalibrationValue(gamepad1, "upperlServoClose") {
+			protected void changeValue() {
+				
+				if (upButtonClicked() && value <= 1) {
+					value += 0.05;
+				}
+				if (downButtonClicked() && value >= 0) {
+					value -= 0.05;
+				}
+				
+				upperLeftGripper.setPosition(value);
+				
+				
+				telemetry.addLine("Upper left servo close position.");
+				telemetry.addData("Value", value);
+				telemetry.update();
+				
+			}
+		}.calibrate(manager);
+		
+		sleep(500);
+		
+		//Upper right servo open.
+		new CalibrationValue(gamepad1, "upperrServoOpen") {
+			protected void changeValue() {
+				
+				if (upButtonClicked() && value <= 1) {
+					value += 0.05;
+				}
+				if (downButtonClicked() && value >= 0) {
+					value -= 0.05;
+				}
+				
+				upperRightGripper.setPosition(value);
+				
+				
+				telemetry.addLine("Upper right servo open position.");
+				telemetry.addData("Value", value);
+				telemetry.update();
+				
+			}
+		}.calibrate(manager);
+		
+		sleep(500);
+		
+		//Upper right servo closed.
+		new CalibrationValue(gamepad1, "upperrServoClose") {
+			protected void changeValue() {
+				
+				if (upButtonClicked() && value <= 1) {
+					value += 0.05;
+				}
+				if (downButtonClicked() && value >= 0) {
+					value -= 0.05;
+				}
+				
+				upperRightGripper.setPosition(value);
+				
+				
+				telemetry.addLine("Upper right servo close position.");
+				telemetry.addData("Value", value);
+				telemetry.update();
+				
+			}
+		}.calibrate(manager);
+		
+		sleep(500);
+		
+		// --- Lift ---
+		
+		//Lift power.
 		new CalibrationValue(gamepad1, "liftPower") {
 			protected void changeValue() {
 
@@ -139,12 +242,14 @@ public class Calibration extends LinearOpMode {
 
 			}
 		}.calibrate(manager);
-
+		
+		sleep(500);
+		
 		manager.save();
 		telemetry.addLine("Data saved.");
 		telemetry.update();
 		
-		sleep(5000);
+		sleep(2000);
 		
 	}
 	
