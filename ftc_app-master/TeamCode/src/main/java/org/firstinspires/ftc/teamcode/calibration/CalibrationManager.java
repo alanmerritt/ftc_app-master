@@ -84,7 +84,13 @@ public class CalibrationManager {
 			
 		} catch (FileNotFoundException ex) {
 			
-			//TODO: Create new file if one isn't found.
+			try {
+				new FileOutputStream(CALIBRATION_FILE_PATH, false).close();
+			} catch(FileNotFoundException e) {
+				telemetry.addLine("New file could not be created.");
+			} catch(IOException e) {
+				
+			}
 			return false;
 			
 		} catch (IOException ex) {
@@ -100,7 +106,7 @@ public class CalibrationManager {
 	/**
 	 * Returns the value of the specified key.
 	 * @param key The key of the value to get.
-	 * @return The value; null if the key does not exist.
+	 * @return The value; or an empty string if the key does not exist.
 	 */
 	public String get(String key) {
 		

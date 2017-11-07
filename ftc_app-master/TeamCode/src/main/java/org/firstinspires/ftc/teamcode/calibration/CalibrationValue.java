@@ -65,8 +65,6 @@ public abstract class CalibrationValue {
 		return false;
 	}
 	
-	
-	
 	/**
 	 * Runs the user implementation until the a button
 	 * on the gamepad is pressed, after which, it stores
@@ -77,7 +75,14 @@ public abstract class CalibrationValue {
 		
 		boolean exitLoop = false;
 		
-		value = Double.parseDouble(manager.get(valueName));
+		//Try loading the existing value for this CalibrationValue.
+		//If there is one, set value to it, otherwise, set value to 0.
+		String previousValue = manager.get(valueName);
+		if(!previousValue.equals("")) {
+			value = Double.parseDouble(previousValue);
+		} else {
+			value = 0;
+		}
 		
 		//Loop until the a button is clicked.
 		while(!exitLoop) {
