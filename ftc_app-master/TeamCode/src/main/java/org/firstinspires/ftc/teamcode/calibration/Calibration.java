@@ -22,6 +22,7 @@ public class Calibration extends LinearOpMode {
 		final Servo rightGripper = hardwareMap.servo.get("rightGripper");
 		final Servo upperRightGripper = hardwareMap.servo.get("upperRightGripper");
 		final Servo upperLeftGripper = hardwareMap.servo.get("upperLeftGripper");
+		final Servo knockerOffer = hardwareMap.servo.get("knockerOffer");
 		
 		final DcMotor leftLift = hardwareMap.dcMotor.get("leftLift");
 		leftLift.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -244,6 +245,45 @@ public class Calibration extends LinearOpMode {
 		}.calibrate(manager);
 		
 		sleep(500);
+		
+		
+		new CalibrationValue(gamepad1, "knockerOfferRaised") {
+			protected void changeValue() {
+				
+				if(upButtonClicked() && value <= 1) {
+					value += .05;
+				} else if(downButtonClicked() && value >= 0) {
+					value -= .05;
+				}
+				
+				knockerOffer.setPosition(value);
+				
+				telemetry.addLine("Knocker offer raised position.");
+				telemetry.addData("Value", value);
+				telemetry.update();
+				
+			}
+		}.calibrate(manager);
+		
+		sleep(500);
+		
+		new CalibrationValue(gamepad1, "knockerOfferLowered") {
+			protected void changeValue() {
+				
+				if(upButtonClicked() && value <= 1) {
+					value += .05;
+				} else if(downButtonClicked() && value >= 0) {
+					value -= .05;
+				}
+				
+				knockerOffer.setPosition(value);
+				
+				telemetry.addLine("Knocker offer lowered position.");
+				telemetry.addData("Value", value);
+				telemetry.update();
+				
+			}
+		}.calibrate(manager);
 		
 		manager.save();
 		telemetry.addLine("Data saved.");
