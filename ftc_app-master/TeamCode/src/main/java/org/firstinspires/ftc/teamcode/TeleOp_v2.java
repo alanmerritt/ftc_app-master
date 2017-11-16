@@ -4,7 +4,9 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.calibration.CalibrationManager;
@@ -55,50 +57,69 @@ public class TeleOp_v2 extends OpMode {
 	private double placementOrientation = 0;
 	private boolean returnToPlacementOrientation = false;
 	
+	private DigitalChannel liftDetector;
+	private boolean lBumperPressedLast = false;
+	private boolean autoLowerSlide = false;
+	
 	@Override
 	public void init() {
 		
+		//Drive motors.
 		frontLeft = hardwareMap.dcMotor.get("fl");
 		frontRight = hardwareMap.dcMotor.get("fr");
 		backRight = hardwareMap.dcMotor.get("br");
 		backLeft = hardwareMap.dcMotor.get("bl");
 		
+		//Set the mode to brake.
 		frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		
+		//Reverse the left motors.
 		frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 		backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 		
+		//Lift motors.
 		rightLift = hardwareMap.dcMotor.get("rightLift");
 		leftLift = hardwareMap.dcMotor.get("leftLift");
 		
+		//Reverse one of the lift motors.
 		leftLift.setDirection(DcMotorSimple.Direction.REVERSE);
 		
+		//Set the lift motors to brake mode.
 		leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		
+		//Get the gripper servos.
 		rightGripper = hardwareMap.servo.get("rightGripper");
 		leftGripper = hardwareMap.servo.get("leftGripper");
 		upperRightGripper = hardwareMap.servo.get("upperRightGripper");
 		upperLeftGripper = hardwareMap.servo.get("upperLeftGripper");
 		
+		liftDetector = hardwareMap.get(DigitalChannel.class, "btnLiftDetector");
+		liftDetector.setMode(DigitalChannel.Mode.INPUT);
+		
+		//Initialize the gyroscope.
 		gyro = new Gyro(this);
 		
 		telemetry.addLine("Hardware mapping complete.");
 		
 		CalibrationManager calibrationManager = new CalibrationManager(telemetry);
+		
+		//Get the lower servo open/close values.
 		lServoOpen = Double.parseDouble(calibrationManager.get("lServoOpen"));
 		lServoClose = Double.parseDouble(calibrationManager.get("lServoClose"));
 		rServoOpen = Double.parseDouble(calibrationManager.get("rServoOpen"));
 		rServoClose = Double.parseDouble(calibrationManager.get("rServoClose"));
 		
+		//Get the upper servo open/close values.
 		ulServoOpen = Double.parseDouble(calibrationManager.get("upperlServoOpen"));
 		ulServoClose = Double.parseDouble(calibrationManager.get("upperlServoClose"));
 		urServoOpen = Double.parseDouble(calibrationManager.get("upperrServoOpen"));
 		urServoClose = Double.parseDouble(calibrationManager.get("upperrServoClose"));
 		
+		//Get the lift power values.
 		liftUpPower = -Double.parseDouble(calibrationManager.get("liftPower"));
 		liftDownPower = Double.parseDouble(calibrationManager.get("liftPower"));
 		telemetry.addLine("Calibration data loaded.");
@@ -115,6 +136,8 @@ public class TeleOp_v2 extends OpMode {
 		telemetry.addData("Yaw", gyro.getYaw());
 		telemetry.addData("Total yaw", gyro.getTotalYaw());
 		
+		
+		
 		drive();
 		runLift();
 		runGripper();
@@ -125,30 +148,42 @@ public class TeleOp_v2 extends OpMode {
 	
 	private void drive() {
 		
+		//Get the joystick values.
 		double x = gamepad1.left_stick_x;
 		double y = gamepad1.left_stick_y;
 		double r = gamepad1.right_stick_x;
 		
+		telemetry.addData("X", x);
+		telemetry.addData("Y", y);
+		telemetry.addData("R", r);
+		
+		// --- Auto-turning function. ---
+		
+		//Rotate toward the box.
 		if(returnToPlacementOrientation) {
 			r = 1;
-			telemetry.addLine("Returning to placement.");
 		}
 		
+		//Activate the auto-turn.
 		if(gamepad1.y) {
 			returnToPlacementOrientation = true;
 		}
+		
+		//Turning range.
 		double min = placementOrientation - 5;
 		double max = placementOrientation + 5;
 		double position = gyro.getYaw();
 		
+		//If the robot is within the range, stop the function.
 		if(position >= min && position <= max) {
-			
 			returnToPlacementOrientation = false;
-			
 		}
 		
 		telemetry.addData("Returning to placement location", returnToPlacementOrientation);
 		
+		// ------------------------------
+		
+		//Drive the motors in robot-centric mode.
 		frontLeft.setPower(Range.clip(y - x - r, -1, 1));
 		backLeft.setPower(Range.clip(y + x - r, -1, 1));
 		frontRight.setPower(Range.clip(y + x + r, -1, 1));
@@ -158,17 +193,47 @@ public class TeleOp_v2 extends OpMode {
 	
 	private void runLift() {
 		
+		//TODO: Scale the speed depending on how far the trigger is pressed.
+		
+		//Operate the lift when the triggers are pressed.
 		if(gamepad1.right_trigger != 0 || gamepad2.right_trigger != 0) {
 			rightLift.setPower(liftUpPower);
 			leftLift.setPower(liftUpPower);
+			autoLowerSlide = false; //Manual override auto lower.
 		} else if(gamepad1.left_trigger != 0 || gamepad2.left_trigger != 0) {
-			
 			rightLift.setPower(liftDownPower);
 			leftLift.setPower(liftDownPower);
+			autoLowerSlide = false; //Manual override auto lower.
 		} else {
-			rightLift.setPower(LIFT_STOP_POWER);
-			leftLift.setPower(LIFT_STOP_POWER);
+			
+			telemetry.addLine();
+			telemetry.addLine("No manual control.");
+			telemetry.addData("Auto-lower", autoLowerSlide);
+			
+			//Turn on the auto-lowering when a bumper is clicked.
+			if((gamepad1.left_bumper || gamepad2.left_bumper) && !lBumperPressedLast) {
+				autoLowerSlide = true;
+			}
+			
+			//If the button is hit, turn off the auto-lowering function.
+			if(!liftDetector.getState()) {
+				telemetry.addLine("Lift stop button pressed.");
+				autoLowerSlide = false;
+			}
+			
+			//If auto-lowering is activated, lower the slide.
+			if(autoLowerSlide) {
+				rightLift.setPower(liftDownPower);
+				leftLift.setPower(liftDownPower);
+			} else { //Otherwise, turn off the slide.
+				rightLift.setPower(LIFT_STOP_POWER);
+				leftLift.setPower(LIFT_STOP_POWER);
+			}
+			
 		}
+		
+		//Update bumper pressed last.
+		lBumperPressedLast = gamepad1.left_bumper || gamepad2.left_bumper;
 		
 		telemetry.addLine();
 		telemetry.addData("Gamepad1 left", gamepad1.left_trigger);
@@ -181,6 +246,7 @@ public class TeleOp_v2 extends OpMode {
 	
 	private void runGripper() {
 		
+		// --- Lower gripper ---
 		if((gamepad1.a || gamepad2.a) && !gripperPressedLast) {
 			gripperOn = !gripperOn;
 		}
@@ -194,8 +260,10 @@ public class TeleOp_v2 extends OpMode {
 		}
 		
 		gripperPressedLast = gamepad1.a || gamepad2.a;
+		// ---------------------
 		
-		// --- Upper Gripper ---
+		
+		// --- Upper gripper ---
 		if((gamepad1.b || gamepad2.b) && !upperGripperPressedLast) {
 			upperGripperOn = !upperGripperOn;
 		}
@@ -209,6 +277,7 @@ public class TeleOp_v2 extends OpMode {
 		}
 		
 		upperGripperPressedLast = gamepad1.b || gamepad2.b;
+		// ---------------------
 		
 	}
 	
