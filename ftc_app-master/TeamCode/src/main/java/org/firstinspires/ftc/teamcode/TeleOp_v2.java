@@ -193,18 +193,33 @@ public class TeleOp_v2 extends OpMode {
 	
 	private void runLift() {
 		
-		//TODO: Scale the speed depending on how far the trigger is pressed.
+		//TODO: Test motor speed scaling.
+		
+		double liftPower;
 		
 		//Operate the lift when the triggers are pressed.
-		if(gamepad1.right_trigger != 0 || gamepad2.right_trigger != 0) {
-			rightLift.setPower(liftUpPower);
-			leftLift.setPower(liftUpPower);
-			autoLowerSlide = false; //Manual override auto lower.
-		} else if(gamepad1.left_trigger != 0 || gamepad2.left_trigger != 0) {
-			rightLift.setPower(liftDownPower);
-			leftLift.setPower(liftDownPower);
-			autoLowerSlide = false; //Manual override auto lower.
-		} else {
+		if(gamepad1.right_trigger != 0) { //First right trigger - raises lift.
+			
+			liftPower = gamepad1.right_trigger;
+			
+		} else if(gamepad1.left_trigger != 0) { //First left trigger - lowers lift.
+			
+			liftPower = -gamepad1.left_trigger;
+			
+		} else if(gamepad2.right_trigger != 0) { //Second right trigger - raises lift.
+			
+			liftPower = gamepad2.right_trigger;
+			
+		} else if(gamepad2.left_trigger != 0) { //Second left trigger - lowers lift.
+			
+			liftPower = -gamepad2.left_trigger;
+			
+		} else { //Deactivates lift.
+			
+			liftPower = 0;
+			
+		}
+		/*else {
 			
 			telemetry.addLine();
 			telemetry.addLine("No manual control.");
@@ -231,9 +246,18 @@ public class TeleOp_v2 extends OpMode {
 			}
 			
 		}
+		}
 		
 		//Update bumper pressed last.
 		lBumperPressedLast = gamepad1.left_bumper || gamepad2.left_bumper;
+		
+		*/
+		
+		//Decrease the motor power.
+		liftPower /= 2;
+		
+		leftLift.setPower(liftPower);
+		rightLift.setPower(liftPower);
 		
 		telemetry.addLine();
 		telemetry.addData("Gamepad1 left", gamepad1.left_trigger);
