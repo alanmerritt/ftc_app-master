@@ -18,7 +18,7 @@ public abstract class Auto extends LinearOpMode {
 	protected final int ENCODER_TICKS_PER_REVOLUTION = 1120;
 	protected final int WHEEL_DIAMETER = 4; //in.
 	protected final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI; //in
-	protected final double TICKS_PER_INCH = ENCODER_TICKS_PER_REVOLUTION / WHEEL_CIRCUMFERENCE;
+	protected final int INCH = (int)(ENCODER_TICKS_PER_REVOLUTION / WHEEL_CIRCUMFERENCE);
 	
 	protected DcMotor frontLeft;
 	protected DcMotor frontRight;
@@ -54,6 +54,8 @@ public abstract class Auto extends LinearOpMode {
 	protected double knockerOfferLowered;
 	
 	protected ColorSensor colorSensor;
+	
+	protected boolean hasReversed = false;
 	
 	protected void initialize() {
 		
@@ -177,14 +179,14 @@ public abstract class Auto extends LinearOpMode {
 		
 	}
 	
-	private void setModes(DcMotor.RunMode mode) {
+	protected void setModes(DcMotor.RunMode mode) {
 		frontLeft.setMode(mode);
 		frontRight.setMode(mode);
 		backRight.setMode(mode);
 		backLeft.setMode(mode);
 	}
 	
-	private void setTargets(int target) {
+	protected void setTargets(int target) {
 		frontLeft.setTargetPosition(target);
 		frontRight.setTargetPosition(target);
 		backRight.setTargetPosition(target);
@@ -229,13 +231,15 @@ public abstract class Auto extends LinearOpMode {
 			knockerOffer.setPosition(knockerOfferRaised);
 			sleep(1500);
 			
+			
+			
 		} else {
 			//If red is seen, drive toward the relic side and back to the middle.
 			
 			//Drive backward, then move back forward.
 			setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 			setModes(DcMotor.RunMode.RUN_TO_POSITION);
-			setTargets(-1120/5);
+			setTargets(-1120/4);
 			while(frontLeft.isBusy()) {
 				driveForwardBackward(-PLATFORM_MOVEMENT_SPEED);
 			}
@@ -247,11 +251,13 @@ public abstract class Auto extends LinearOpMode {
 			
 			setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 			setModes(DcMotor.RunMode.RUN_TO_POSITION);
-			setTargets(1120/4);
+			setTargets(1120/2);
 			while(frontLeft.isBusy()) {
 				driveForwardBackward(PLATFORM_MOVEMENT_SPEED);
 			}
 			stopDriveMotors();
+			
+			
 			
 		}
 		
@@ -289,12 +295,14 @@ public abstract class Auto extends LinearOpMode {
 			knockerOffer.setPosition(knockerOfferRaised);
 			sleep(1500);
 			
+			
+			
 		} else { //If red is seen.
 			
 			//Drive backward, then move back forward.
 			setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 			setModes(DcMotor.RunMode.RUN_TO_POSITION);
-			setTargets(1120/5);
+			setTargets(1120/4);
 			while(frontLeft.isBusy()) {
 				driveForwardBackward(PLATFORM_MOVEMENT_SPEED);
 			}
@@ -306,16 +314,30 @@ public abstract class Auto extends LinearOpMode {
 			
 			setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 			setModes(DcMotor.RunMode.RUN_TO_POSITION);
-			setTargets(-1120/4);
+			setTargets(-1120/2);
 			while(frontLeft.isBusy()) {
 				driveForwardBackward(-PLATFORM_MOVEMENT_SPEED);
 			}
 			stopDriveMotors();
 			
+			
+			
 		}
 		
 		setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 		setModes(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+		
+	}
+	
+	void backup() {
+		
+		//Backward movement.
+		setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		setModes(DcMotor.RunMode.RUN_TO_POSITION);
+		setTargets(-2 * INCH);
+		driveMotors(.5, .5, .5, .5);
+		while(frontLeft.isBusy());
+		stopDriveMotors();
 		
 	}
 	
