@@ -85,7 +85,10 @@ public class TeleOp_v2 extends OpMode {
 		leftLift = hardwareMap.dcMotor.get("leftLift");
 		
 		//Reverse one of the lift motors.
-		leftLift.setDirection(DcMotorSimple.Direction.REVERSE);
+		rightLift.setDirection(DcMotorSimple.Direction.REVERSE);
+		
+		leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 		
 		//Set the lift motors to brake mode.
 		leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -200,23 +203,34 @@ public class TeleOp_v2 extends OpMode {
 		//Operate the lift when the triggers are pressed.
 		if(gamepad1.right_trigger != 0) { //First right trigger - raises lift.
 			
-			liftPower = gamepad1.right_trigger;
+			liftPower = gamepad1.right_trigger * .75;
 			
 		} else if(gamepad1.left_trigger != 0) { //First left trigger - lowers lift.
 			
-			liftPower = -gamepad1.left_trigger;
+			liftPower = -gamepad1.left_trigger * .75;
 			
 		} else if(gamepad2.right_trigger != 0) { //Second right trigger - raises lift.
 			
-			liftPower = gamepad2.right_trigger;
+			liftPower = gamepad2.right_trigger * .75;
 			
 		} else if(gamepad2.left_trigger != 0) { //Second left trigger - lowers lift.
 			
-			liftPower = -gamepad2.left_trigger;
+			liftPower = -gamepad2.left_trigger * .75;
 			
 		} else { //Deactivates lift.
 			
 			liftPower = 0;
+			
+			if(gamepad1.left_bumper || gamepad2.left_bumper) {
+				
+				
+				if(leftLift.getCurrentPosition() > 200) {
+					liftPower = -.5;
+				} else if(leftLift.getCurrentPosition() > 0) {
+					liftPower = -.1;
+				}
+				
+			}
 			
 		}
 		/*else {
@@ -253,18 +267,16 @@ public class TeleOp_v2 extends OpMode {
 		
 		*/
 		
-		//Decrease the motor power.
-		liftPower /= 2;
 		
 		leftLift.setPower(liftPower);
 		rightLift.setPower(liftPower);
 		
-		telemetry.addLine();
-		telemetry.addData("Gamepad1 left", gamepad1.left_trigger);
-		telemetry.addData("Gamepad2 left", gamepad2.left_trigger);
-		telemetry.addLine();
-		telemetry.addData("Gamepad1 right", gamepad1.right_trigger);
-		telemetry.addData("Gamepad2 right", gamepad2.right_trigger);
+//		telemetry.addLine();
+//		telemetry.addData("Gamepad1 left", gamepad1.left_trigger);
+//		telemetry.addData("Gamepad2 left", gamepad2.left_trigger);
+//		telemetry.addLine();
+//		telemetry.addData("Gamepad1 right", gamepad1.right_trigger);
+//		telemetry.addData("Gamepad2 right", gamepad2.right_trigger);
 		
 	}
 	
