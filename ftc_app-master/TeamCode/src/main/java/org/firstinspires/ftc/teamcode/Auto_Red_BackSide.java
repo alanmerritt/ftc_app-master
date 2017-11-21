@@ -39,7 +39,7 @@ public class Auto_Red_BackSide extends Auto {
 		setModes(DcMotor.RunMode.RUN_TO_POSITION);
 		setTargets(18 * INCH);
 		driveMotors(.5, .5, .5, .5);
-		while(frontLeft.isBusy());
+		while(frontLeft.isBusy() && !isStopRequested());
 		stopDriveMotors();
 		
 		sleep(1000);
@@ -51,7 +51,7 @@ public class Auto_Red_BackSide extends Auto {
 		backRight.setTargetPosition(-5 * INCH);
 		backLeft.setTargetPosition(5 * INCH);
 		driveMotors(.5, .5, .5, .5);
-		while(frontLeft.isBusy());
+		while(frontLeft.isBusy() && !isStopRequested());
 		stopDriveMotors();
 		
 		sleep(1000);
@@ -59,9 +59,9 @@ public class Auto_Red_BackSide extends Auto {
 		//Forward movement.
 		setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 		setModes(DcMotor.RunMode.RUN_TO_POSITION);
-		setTargets(7 * INCH);
+		setTargets(9 * INCH);
 		driveMotors(.5, .5, .5, .5);
-		while(frontLeft.isBusy());
+		while(frontLeft.isBusy() && !isStopRequested());
 		stopDriveMotors();
 		
 		sleep(1000);

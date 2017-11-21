@@ -28,20 +28,20 @@ public abstract class Auto extends LinearOpMode {
 	private DcMotor rightLift;
 	private DcMotor leftLift;
 	
-	private Servo rightGripper;
-	private Servo leftGripper;
-	private Servo upperRightGripper;
-	private Servo upperLeftGripper;
+	protected Servo rightGripper;
+	protected Servo leftGripper;
+	protected Servo upperRightGripper;
+	protected Servo upperLeftGripper;
 	
-	private double lServoOpen;
-	private double lServoClose;
-	private double rServoOpen;
-	private double rServoClose;
+	protected double lServoOpen;
+	protected double lServoClose;
+	protected double rServoOpen;
+	protected double rServoClose;
 	
-	private double ulServoOpen;
-	private double ulServoClose;
-	private double urServoOpen;
-	private double urServoClose;
+	protected double ulServoOpen;
+	protected double ulServoClose;
+	protected double urServoOpen;
+	protected double urServoClose;
 	
 	Gyro gyro;
 	
@@ -53,9 +53,9 @@ public abstract class Auto extends LinearOpMode {
 	protected double knockerOfferRaised;
 	protected double knockerOfferLowered;
 	
-	protected ColorSensor colorSensor;
+	protected final int LIFT_RAISE_POSITION = (1120/3)*2;
 	
-	protected boolean hasReversed = false;
+	protected ColorSensor colorSensor;
 	
 	protected void initialize() {
 		
@@ -157,7 +157,7 @@ public abstract class Auto extends LinearOpMode {
 		
 		leftLift.setPower(.2);
 		rightLift.setPower(.2);
-		while(leftLift.getCurrentPosition() < 1120/2);
+		while(leftLift.getCurrentPosition() < LIFT_RAISE_POSITION && !isStopRequested());
 		leftLift.setPower(0);
 		rightLift.setPower(0);
 		
@@ -170,7 +170,7 @@ public abstract class Auto extends LinearOpMode {
 		
 		leftLift.setPower(-.1);
 		rightLift.setPower(-.1);
-		while(leftLift.getCurrentPosition() > -1120/2);
+		while(leftLift.getCurrentPosition() > -LIFT_RAISE_POSITION && !isStopRequested());
 		leftLift.setPower(0);
 		rightLift.setPower(0);
 		
@@ -221,7 +221,7 @@ public abstract class Auto extends LinearOpMode {
 			setModes(DcMotor.RunMode.RUN_TO_POSITION);
 			
 			setTargets(1120/4);
-			while(frontLeft.isBusy()) {
+			while(frontLeft.isBusy() && !isStopRequested()) {
 				driveForwardBackward(PLATFORM_MOVEMENT_SPEED);
 			}
 			stopDriveMotors();
@@ -240,7 +240,7 @@ public abstract class Auto extends LinearOpMode {
 			setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 			setModes(DcMotor.RunMode.RUN_TO_POSITION);
 			setTargets(-1120/4);
-			while(frontLeft.isBusy()) {
+			while(frontLeft.isBusy() && !isStopRequested()) {
 				driveForwardBackward(-PLATFORM_MOVEMENT_SPEED);
 			}
 			stopDriveMotors();
@@ -252,7 +252,7 @@ public abstract class Auto extends LinearOpMode {
 			setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 			setModes(DcMotor.RunMode.RUN_TO_POSITION);
 			setTargets(1120/2);
-			while(frontLeft.isBusy()) {
+			while(frontLeft.isBusy() && !isStopRequested()) {
 				driveForwardBackward(PLATFORM_MOVEMENT_SPEED);
 			}
 			stopDriveMotors();
@@ -286,7 +286,7 @@ public abstract class Auto extends LinearOpMode {
 			setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 			setModes(DcMotor.RunMode.RUN_TO_POSITION);
 			setTargets(-1120/4);
-			while(frontLeft.isBusy()) {
+			while(frontLeft.isBusy() && !isStopRequested()) {
 				driveForwardBackward(-PLATFORM_MOVEMENT_SPEED);
 			}
 			stopDriveMotors();
@@ -303,7 +303,7 @@ public abstract class Auto extends LinearOpMode {
 			setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 			setModes(DcMotor.RunMode.RUN_TO_POSITION);
 			setTargets(1120/4);
-			while(frontLeft.isBusy()) {
+			while(frontLeft.isBusy() && !isStopRequested()) {
 				driveForwardBackward(PLATFORM_MOVEMENT_SPEED);
 			}
 			stopDriveMotors();
@@ -315,7 +315,7 @@ public abstract class Auto extends LinearOpMode {
 			setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 			setModes(DcMotor.RunMode.RUN_TO_POSITION);
 			setTargets(-1120/2);
-			while(frontLeft.isBusy()) {
+			while(frontLeft.isBusy() && !isStopRequested()) {
 				driveForwardBackward(-PLATFORM_MOVEMENT_SPEED);
 			}
 			stopDriveMotors();
@@ -336,7 +336,7 @@ public abstract class Auto extends LinearOpMode {
 		setModes(DcMotor.RunMode.RUN_TO_POSITION);
 		setTargets(-2 * INCH);
 		driveMotors(.5, .5, .5, .5);
-		while(frontLeft.isBusy());
+		while(frontLeft.isBusy() && !isStopRequested());
 		stopDriveMotors();
 		
 	}

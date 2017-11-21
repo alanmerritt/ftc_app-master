@@ -26,7 +26,7 @@ public class Auto_Blue_BackSide extends Auto {
 		setModes(DcMotor.RunMode.RUN_TO_POSITION);
 		setTargets(-23 * INCH);
 		driveMotors(.5, .5, .5, .5);
-		while(frontLeft.isBusy());
+		while(frontLeft.isBusy() && !isStopRequested());
 		stopDriveMotors();
 		
 		sleep(1000);
@@ -34,7 +34,7 @@ public class Auto_Blue_BackSide extends Auto {
 		
 		setModes(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 		double yaw = gyro.getTotalYaw();
-		while(yaw > -175) {
+		while(yaw > -175 && !isStopRequested()) {
 			gyro.updateYaw();
 			yaw = gyro.getTotalYaw();
 			driveMotors(.3, -.3, -.3, .3);
@@ -48,7 +48,7 @@ public class Auto_Blue_BackSide extends Auto {
 		backRight.setTargetPosition(6 * INCH);
 		backLeft.setTargetPosition(-6 * INCH);
 		driveMotors(.5, .5, .5, .5);
-		while(frontLeft.isBusy());
+		while(frontLeft.isBusy() && !isStopRequested());
 		stopDriveMotors();
 		
 		sleep(1000);
@@ -56,9 +56,9 @@ public class Auto_Blue_BackSide extends Auto {
 		//Forward movement.
 		setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 		setModes(DcMotor.RunMode.RUN_TO_POSITION);
-		setTargets(5 * INCH);
+		setTargets(7 * INCH);
 		driveMotors(.5, .5, .5, .5);
-		while(frontLeft.isBusy());
+		while(frontLeft.isBusy() && !isStopRequested());
 		stopDriveMotors();
 		
 		sleep(1000);
