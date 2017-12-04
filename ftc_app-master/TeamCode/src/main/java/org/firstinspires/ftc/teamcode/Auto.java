@@ -6,7 +6,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.calibration.CalibrationManager;
+
+import java.util.ArrayList;
 
 /**
  * Created by MerrittAM on 11/9/2017.
@@ -55,11 +61,13 @@ public abstract class Auto extends LinearOpMode {
 	
 	protected final int LIFT_RAISE_POSITION = (1120/3)*2;
 	
+	protected CalibrationManager calibrationManager = new CalibrationManager(telemetry);
+	
 	protected ColorSensor colorSensor;
 	
-	protected void initialize() {
+	private void setupDrive() {
 		
-		//Drive motors.
+		//Hardware map drive motors.
 		frontLeft = hardwareMap.dcMotor.get("fl");
 		frontRight = hardwareMap.dcMotor.get("fr");
 		backRight = hardwareMap.dcMotor.get("br");
@@ -75,6 +83,10 @@ public abstract class Auto extends LinearOpMode {
 		frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
 		backRight.setDirection(DcMotorSimple.Direction.REVERSE);
 		
+	}
+	
+	private void setupLift() {
+		
 		//Lift motors.
 		rightLift = hardwareMap.dcMotor.get("rightLift");
 		leftLift = hardwareMap.dcMotor.get("leftLift");
@@ -86,20 +98,15 @@ public abstract class Auto extends LinearOpMode {
 		leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		
+	}
+	
+	private void setupGrippers() {
+		
 		//Get the gripper servos.
 		rightGripper = hardwareMap.servo.get("rightGripper");
 		leftGripper = hardwareMap.servo.get("leftGripper");
 		upperRightGripper = hardwareMap.servo.get("upperRightGripper");
 		upperLeftGripper = hardwareMap.servo.get("upperLeftGripper");
-		
-		//Initialize the gyroscope.
-		gyro = new Gyro(this);
-		
-		knockerOffer = hardwareMap.servo.get("knockerOffer");
-		
-		colorSensor = hardwareMap.get(ColorSensor.class, "colorSensor");
-		
-		CalibrationManager calibrationManager = new CalibrationManager(telemetry);
 		
 		//Get the lower servo open/close values.
 		lServoOpen = Double.parseDouble(calibrationManager.get("lServoOpen"));
@@ -113,8 +120,112 @@ public abstract class Auto extends LinearOpMode {
 		urServoOpen = Double.parseDouble(calibrationManager.get("upperrServoOpen"));
 		urServoClose = Double.parseDouble(calibrationManager.get("upperrServoClose"));
 		
+	}
+	
+	private void setupKnockerOffer() {
+		
+		knockerOffer = hardwareMap.servo.get("knockerOffer");
 		knockerOfferRaised = Double.parseDouble(calibrationManager.get("knockerOfferRaised"));
 		knockerOfferLowered = Double.parseDouble(calibrationManager.get("knockerOfferLowered"));
+		
+		//Initialize knocker-offer to raised position.
+		knockerOffer.setPosition(knockerOfferRaised);
+		
+		colorSensor = hardwareMap.get(ColorSensor.class, "colorSensor");
+		
+	}
+	
+	
+	protected ArrayList<String> messages;
+	
+	private VuforiaLocalizer vuforia;
+	private VuforiaTrackables relicTrackables;
+	
+	/**
+	 * Prepares the Vuforia computer vision
+	 * for object detection.
+	 */
+	private void setupVuforia() {
+		
+		
+		int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+		VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+		
+		messages.add("Camera monitor set up.");
+		writeMessages();
+		
+		parameters.vuforiaLicenseKey = "ARS60u//////AAAAGatg5bzrIElJruCZEPDqKr8mksRb99R0GEdJMfM4xVotZyXhiShn+ToKcAK2foRmNGNekn6uvxjmkdjbOlFvoQhDYJVBYvFF3afgz8aWcqo+WkdT3pXqnEcrPtMd4bz/CuC65ajgco231Ca7iUjqk7tuzv5Zg5gUpAfE2FulF0GIq6sXboe5OqrDxCLG+tA6oF24zuzFCEGZHUs8PDL3NwoA2KKbZttdoE13Kvqq9+AgBrqWeIYwefx9nkzWmn81QXHFd68APHaKyKT1PNxWKEK9aDL5vp4LRiG17AaBaGpXedpKVN4/o6GAWJm2zCOLwOb1aSMP8u7hDTXxsax0iMyEFYpzhshDar3HwD4xNy28";
+		
+		messages.add("License key applied.");
+		writeMessages();
+		
+		parameters.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
+		
+		messages.add("Camera direction set.");
+		writeMessages();
+		
+		this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
+		
+		messages.add("Localizer created.");
+		writeMessages();
+		
+		relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
+		
+		messages.add("Trackables loaded.");
+		writeMessages();
+		
+		VuforiaTrackable relicTemplate = relicTrackables.get(0);
+		
+		messages.add("Templates gotten.");
+		writeMessages();
+		
+		relicTemplate.setName("relicVuMarkTemplate");
+		
+		messages.add("Template named.");
+		writeMessages();
+		
+	}
+	
+	
+	protected void initialize() {
+		
+		messages = new ArrayList<>();
+		
+		setupDrive();
+		
+		messages.add("Drive initialized.");
+		writeMessages();
+		
+		setupLift();
+		
+		messages.add("Lift initialized.");
+		writeMessages();
+		
+		setupGrippers();
+		
+		messages.add("Grippers initialized.");
+		writeMessages();
+		
+		setupKnockerOffer();
+		
+		messages.add("Knocker-offer initialized.");
+		writeMessages();
+		
+		//Initialize the gyroscope.
+		gyro = new Gyro(this);
+		
+		messages.add("Gyro initialized.");
+		writeMessages();
+		
+		setupVuforia();
+		
+		messages.add("Vuforia setup complete.");
+		writeMessages();
+		
+		
+		
+		messages.add("Initialization complete.");
+		writeMessages();
 		
 	}
 	
@@ -338,6 +449,18 @@ public abstract class Auto extends LinearOpMode {
 		driveMotors(.5, .5, .5, .5);
 		while(frontLeft.isBusy() && !isStopRequested());
 		stopDriveMotors();
+		
+	}
+	
+	private void writeMessages() {
+		
+		for(String s : messages) {
+			
+			telemetry.addLine(s);
+			
+		}
+		
+		telemetry.update();
 		
 	}
 	
