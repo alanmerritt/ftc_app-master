@@ -17,8 +17,8 @@ import java.util.ArrayList;
  * Version 2 of the blue, back autonomous which implements
  * the computer vision to place blocks in the correct column.
  */
-@Autonomous(name = "Auto_Blue_Backside_v2", group = "Autonomous")
-public class Auto_Blue_BackSide_v2 extends Auto {
+@Autonomous(name = "Auto_Blue_Backside_Computer_Vision_Test", group = "Autonomous")
+public class Auto_Blue_BackSide_Computer_Vision_Test extends Auto {
 	
 	
 	//Vuforia object thing.
