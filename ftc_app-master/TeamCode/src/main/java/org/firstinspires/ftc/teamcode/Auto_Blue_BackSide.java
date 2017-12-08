@@ -14,52 +14,27 @@ public class Auto_Blue_BackSide extends Auto {
 		
 		initialize();
 		
+		relicTrackables.activate();
+		
 		waitForStart();
+		
+		scanVuMark(1000);
 		
 		grabAndLift();
 		
 		blueKnockOff();
 		
+		moveForward();
+		sleep(500);
 		
-		//Forward movement.
-		setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-		setModes(DcMotor.RunMode.RUN_TO_POSITION);
-		setTargets(-23 * INCH);
-		driveMotors(.5, .5, .5, .5);
-		while(frontLeft.isBusy() && !isStopRequested());
-		stopDriveMotors();
+		rotate();
+		sleep(500);
 		
-		sleep(1000);
+		moveToSide();
 		
+		sleep(500);
 		
-		setModes(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-		double yaw = gyro.getTotalYaw();
-		while(yaw > -175 && !isStopRequested()) {
-			gyro.updateYaw();
-			yaw = gyro.getTotalYaw();
-			driveMotors(.3, -.3, -.3, .3);
-		}
-		stopDriveMotors();
-		
-		setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-		setModes(DcMotor.RunMode.RUN_TO_POSITION);
-		frontLeft.setTargetPosition(6 * INCH);
-		frontRight.setTargetPosition(-6 * INCH);
-		backRight.setTargetPosition(6 * INCH);
-		backLeft.setTargetPosition(-6 * INCH);
-		driveMotors(.5, .5, .5, .5);
-		while(frontLeft.isBusy() && !isStopRequested());
-		stopDriveMotors();
-		
-		sleep(1000);
-		
-		//Forward movement.
-		setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-		setModes(DcMotor.RunMode.RUN_TO_POSITION);
-		setTargets(7 * INCH);
-		driveMotors(.5, .5, .5, .5);
-		while(frontLeft.isBusy() && !isStopRequested());
-		stopDriveMotors();
+		moveForwardToColumn();
 		
 		sleep(1000);
 		
@@ -73,4 +48,71 @@ public class Auto_Blue_BackSide extends Auto {
 		
 		
 	}
+	
+	private void moveForward() {
+		
+		//Forward movement.
+		setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		setModes(DcMotor.RunMode.RUN_TO_POSITION);
+		setTargets(-23 * INCH);
+		driveMotors(.5, .5, .5, .5);
+		while(frontLeft.isBusy() && !isStopRequested());
+		stopDriveMotors();
+		
+	}
+	
+	private void rotate() {
+		
+		setModes(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+		double yaw = gyro.getTotalYaw();
+		while(yaw > -175 && !isStopRequested()) {
+			gyro.updateYaw();
+			yaw = gyro.getTotalYaw();
+			driveMotors(.3, -.3, -.3, .3);
+		}
+		stopDriveMotors();
+		
+	}
+	
+	private void moveToSide() {
+		
+		int driveDistance;
+		switch(vuMark) {
+			
+			case RIGHT:
+				driveDistance = 25; //TODO:Move forward more.
+				break;
+			case CENTER:
+				driveDistance = 16;
+				break;
+			case LEFT:
+			default:
+				driveDistance = 8;
+			
+		}
+		
+		setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		setModes(DcMotor.RunMode.RUN_TO_POSITION);
+		frontLeft.setTargetPosition(driveDistance * INCH);
+		frontRight.setTargetPosition(-driveDistance * INCH);
+		backRight.setTargetPosition(driveDistance * INCH);
+		backLeft.setTargetPosition(-driveDistance * INCH);
+		driveMotors(.5, .5, .5, .5);
+		while(frontLeft.isBusy() && !isStopRequested());
+		stopDriveMotors();
+		
+	}
+	
+	private void moveForwardToColumn() {
+		
+		//Forward movement.
+		setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		setModes(DcMotor.RunMode.RUN_TO_POSITION);
+		setTargets(9 * INCH);
+		driveMotors(.5, .5, .5, .5);
+		while(frontLeft.isBusy() && !isStopRequested());
+		stopDriveMotors();
+		
+	}
+	
 }
