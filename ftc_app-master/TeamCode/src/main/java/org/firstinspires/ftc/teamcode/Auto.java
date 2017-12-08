@@ -5,8 +5,10 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
@@ -21,33 +23,33 @@ import java.util.ArrayList;
 
 public abstract class Auto extends LinearOpMode {
 	
-	protected final int ENCODER_TICKS_PER_REVOLUTION = 1120;
-	protected final int WHEEL_DIAMETER = 4; //in.
-	protected final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI; //in
-	protected final int INCH = (int)(ENCODER_TICKS_PER_REVOLUTION / WHEEL_CIRCUMFERENCE);
+	final int ENCODER_TICKS_PER_REVOLUTION = 1120;
+	final int WHEEL_DIAMETER = 4; //in.
+	final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI; //in
+	final int INCH = (int)(ENCODER_TICKS_PER_REVOLUTION / WHEEL_CIRCUMFERENCE);
 	
-	protected DcMotor frontLeft;
-	protected DcMotor frontRight;
-	protected DcMotor backRight;
-	protected DcMotor backLeft;
+	DcMotor frontLeft;
+	DcMotor frontRight;
+	DcMotor backRight;
+	DcMotor backLeft;
 	
-	private DcMotor rightLift;
-	private DcMotor leftLift;
+	DcMotor rightLift;
+	DcMotor leftLift;
 	
-	protected Servo rightGripper;
-	protected Servo leftGripper;
-	protected Servo upperRightGripper;
-	protected Servo upperLeftGripper;
+	Servo rightGripper;
+	Servo leftGripper;
+	Servo upperRightGripper;
+	Servo upperLeftGripper;
 	
-	protected double lServoOpen;
-	protected double lServoClose;
-	protected double rServoOpen;
-	protected double rServoClose;
+	double lServoOpen;
+	double lServoClose;
+	double rServoOpen;
+	double rServoClose;
 	
-	protected double ulServoOpen;
-	protected double ulServoClose;
-	protected double urServoOpen;
-	protected double urServoClose;
+	double ulServoOpen;
+	double ulServoClose;
+	double urServoOpen;
+	double urServoClose;
 	
 	Gyro gyro;
 	
@@ -55,15 +57,15 @@ public abstract class Auto extends LinearOpMode {
 	final boolean GRIPPER_OPEN = false;
 	
 	
-	protected Servo knockerOffer;
-	protected double knockerOfferRaised;
-	protected double knockerOfferLowered;
+	Servo knockerOffer;
+	double knockerOfferRaised;
+	double knockerOfferLowered;
 	
-	protected final int LIFT_RAISE_POSITION = (1120/3)*2;
+	final int LIFT_RAISE_POSITION = (1120/3)*2;
 	
-	protected CalibrationManager calibrationManager = new CalibrationManager(telemetry);
+	CalibrationManager calibrationManager = new CalibrationManager(telemetry);
 	
-	protected ColorSensor colorSensor;
+	ColorSensor colorSensor;
 	
 	private void setupDrive() {
 		
@@ -138,8 +140,9 @@ public abstract class Auto extends LinearOpMode {
 	
 	protected ArrayList<String> messages;
 	
-	private VuforiaLocalizer vuforia;
-	private VuforiaTrackables relicTrackables;
+	protected VuforiaLocalizer vuforia;
+	protected VuforiaTrackables relicTrackables;
+	protected VuforiaTrackable relicTemplate;
 	
 	/**
 	 * Prepares the Vuforia computer vision
@@ -174,7 +177,7 @@ public abstract class Auto extends LinearOpMode {
 		messages.add("Trackables loaded.");
 		writeMessages();
 		
-		VuforiaTrackable relicTemplate = relicTrackables.get(0);
+		relicTemplate = relicTrackables.get(0);
 		
 		messages.add("Templates gotten.");
 		writeMessages();
@@ -186,6 +189,64 @@ public abstract class Auto extends LinearOpMode {
 		
 	}
 	
+	RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.UNKNOWN;
+	void scanVuMark(int timeout) {
+		
+		if(vuMark == RelicRecoveryVuMark.UNKNOWN) {
+			
+			ElapsedTime time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+			time.reset();
+			vuMark = RelicRecoveryVuMark.from(relicTemplate);
+			while (vuMark == RelicRecoveryVuMark.UNKNOWN &&
+					!isStopRequested() && time.time() < timeout && !isStarted()) {
+				
+				vuMark = RelicRecoveryVuMark.from(relicTemplate);
+				telemetry.addLine("Searching for VuMark.");
+				telemetry.update();
+				
+			}
+			
+			if (vuMark != RelicRecoveryVuMark.UNKNOWN) {
+				telemetry.addLine("VuMark found: " + vuMark + ".");
+			} else {
+				telemetry.addLine("No VuMark found.");
+			}
+			
+		} else {
+			telemetry.addLine("VuMark already found.");
+		}
+		
+		telemetry.update();
+		
+	}
+	
+	void scanVuMark() {
+		
+		if(vuMark == RelicRecoveryVuMark.UNKNOWN) {
+			
+			vuMark = RelicRecoveryVuMark.from(relicTemplate);
+			while (vuMark == RelicRecoveryVuMark.UNKNOWN &&
+					!isStopRequested() && !isStarted()) {
+				
+				vuMark = RelicRecoveryVuMark.from(relicTemplate);
+				telemetry.addLine("Searching for VuMark.");
+				telemetry.update();
+				
+			}
+			
+			if (vuMark != RelicRecoveryVuMark.UNKNOWN) {
+				telemetry.addLine("VuMark found: " + vuMark + ".");
+			} else {
+				telemetry.addLine("No VuMark found.");
+			}
+			
+		} else {
+			telemetry.addLine("VuMark already found.");
+		}
+		
+		telemetry.update();
+		
+	}
 	
 	protected void initialize() {
 		
