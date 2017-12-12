@@ -52,14 +52,14 @@ public class TeleOp_v2 extends OpMode {
 	private boolean upperGripperPressedLast = false;
 	private boolean upperGripperOn = false;
 	
+	
+	
 	private Gyro gyro;
 	
 	private double placementOrientation = 0;
 	private boolean returnToPlacementOrientation = false;
 	
 	private DigitalChannel liftDetector;
-	private boolean lBumperPressedLast = false;
-	private boolean autoLowerSlide = false;
 	
 	@Override
 	public void init() {
@@ -161,7 +161,7 @@ public class TeleOp_v2 extends OpMode {
 		telemetry.addData("R", r);
 		
 		// --- Auto-turning function. ---
-		
+		/*
 		//Rotate toward the box.
 		if(returnToPlacementOrientation) {
 			r = 1;
@@ -183,7 +183,7 @@ public class TeleOp_v2 extends OpMode {
 		}
 		
 		telemetry.addData("Returning to placement location", returnToPlacementOrientation);
-		
+		*/
 		// ------------------------------
 		
 		//Drive the motors in robot-centric mode.
@@ -196,7 +196,7 @@ public class TeleOp_v2 extends OpMode {
 	
 	private void runLift() {
 		
-		//TODO: Test motor speed scaling.
+		
 		
 		double liftPower;
 		
@@ -233,50 +233,11 @@ public class TeleOp_v2 extends OpMode {
 			}
 			
 		}
-		/*else {
-			
-			telemetry.addLine();
-			telemetry.addLine("No manual control.");
-			telemetry.addData("Auto-lower", autoLowerSlide);
-			
-			//Turn on the auto-lowering when a bumper is clicked.
-			if((gamepad1.left_bumper || gamepad2.left_bumper) && !lBumperPressedLast) {
-				autoLowerSlide = true;
-			}
-			
-			//If the button is hit, turn off the auto-lowering function.
-			if(!liftDetector.getState()) {
-				telemetry.addLine("Lift stop button pressed.");
-				autoLowerSlide = false;
-			}
-			
-			//If auto-lowering is activated, lower the slide.
-			if(autoLowerSlide) {
-				rightLift.setPower(liftDownPower);
-				leftLift.setPower(liftDownPower);
-			} else { //Otherwise, turn off the slide.
-				rightLift.setPower(LIFT_STOP_POWER);
-				leftLift.setPower(LIFT_STOP_POWER);
-			}
-			
-		}
-		}
-		
-		//Update bumper pressed last.
-		lBumperPressedLast = gamepad1.left_bumper || gamepad2.left_bumper;
-		
-		*/
 		
 		
 		leftLift.setPower(liftPower);
 		rightLift.setPower(liftPower);
 		
-//		telemetry.addLine();
-//		telemetry.addData("Gamepad1 left", gamepad1.left_trigger);
-//		telemetry.addData("Gamepad2 left", gamepad2.left_trigger);
-//		telemetry.addLine();
-//		telemetry.addData("Gamepad1 right", gamepad1.right_trigger);
-//		telemetry.addData("Gamepad2 right", gamepad2.right_trigger);
 		
 	}
 	
@@ -314,6 +275,15 @@ public class TeleOp_v2 extends OpMode {
 		
 		upperGripperPressedLast = gamepad1.b || gamepad2.b;
 		// ---------------------
+		
+		if(gamepad1.x || gamepad2.x) {
+			gripperOn = true;
+			upperGripperOn = true;
+		}
+		if(gamepad1.y || gamepad2.y) {
+			gripperOn = false;
+			upperGripperOn = false;
+		}
 		
 	}
 	
