@@ -337,6 +337,12 @@ public abstract class Auto extends LinearOpMode {
 	
 	protected void lowerAndRelease() {
 		
+		setLowerGripper(GRIPPER_OPEN);
+		
+		sleep(500);
+		
+		backup(-5);
+		
 		leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 		leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 		
@@ -346,8 +352,7 @@ public abstract class Auto extends LinearOpMode {
 		leftLift.setPower(0);
 		rightLift.setPower(0);
 		
-		sleep(700);
-		setLowerGripper(GRIPPER_OPEN);
+		backup(4);
 		
 	}
 	
@@ -501,15 +506,22 @@ public abstract class Auto extends LinearOpMode {
 		
 	}
 	
-	void backup() {
+	void backup(int distance) {
 		
 		//Backward movement.
 		setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 		setModes(DcMotor.RunMode.RUN_TO_POSITION);
-		setTargets(-2 * INCH);
+		setTargets(distance * INCH);
 		driveMotors(.5, .5, .5, .5);
 		while(frontLeft.isBusy() && !isStopRequested());
 		stopDriveMotors();
+	
+	}
+	
+	@Deprecated
+	void backup() {
+		
+		backup(-5);
 		
 	}
 	
