@@ -327,8 +327,8 @@ public abstract class Auto extends LinearOpMode {
 		leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 		leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 		
-		leftLift.setPower(.2);
-		rightLift.setPower(.2);
+		leftLift.setPower(.4);
+		rightLift.setPower(.4);
 		while(leftLift.getCurrentPosition() < LIFT_RAISE_POSITION && !isStopRequested());
 		leftLift.setPower(0);
 		rightLift.setPower(0);
@@ -403,6 +403,7 @@ public abstract class Auto extends LinearOpMode {
 			}
 			stopDriveMotors();
 			
+			scanVuMark(1000);
 			
 			sleep(1000);
 			knockerOffer.setPosition(knockerOfferRaised);
@@ -421,6 +422,8 @@ public abstract class Auto extends LinearOpMode {
 				driveForwardBackward(-PLATFORM_MOVEMENT_SPEED);
 			}
 			stopDriveMotors();
+			
+			scanVuMark(1000);
 			
 			sleep(1000);
 			knockerOffer.setPosition(knockerOfferRaised);
@@ -468,6 +471,8 @@ public abstract class Auto extends LinearOpMode {
 			}
 			stopDriveMotors();
 			
+			scanVuMark(1000);
+			
 			sleep(1000);
 			knockerOffer.setPosition(knockerOfferRaised);
 			sleep(1500);
@@ -484,6 +489,8 @@ public abstract class Auto extends LinearOpMode {
 				driveForwardBackward(PLATFORM_MOVEMENT_SPEED);
 			}
 			stopDriveMotors();
+			
+			scanVuMark(1000);
 			
 			sleep(1000);
 			knockerOffer.setPosition(knockerOfferRaised);
