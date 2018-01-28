@@ -83,6 +83,8 @@ public class TeleOp_v3 extends OpMode {
 	}
 	
 	private DriveMode driveMode = DriveMode.NORMAL;
+	private boolean driveSwitchLast = false;
+	
 	
 	private void setupDrive() {
 		//Drive motors.
@@ -340,29 +342,99 @@ public class TeleOp_v3 extends OpMode {
 		backLeft.setPower(power);
 	}
 	
+	
 	private void drive() {
 		
-		//Get the joystick values.
-		double x = gamepad1.left_stick_x;
-		double y = gamepad1.left_stick_y;
-		double r = gamepad1.right_stick_x;
+		double x;
+		double y;
+		double r;
 		
+		boolean driveSwitch = gamepad1.dpad_left;
 		
-		
-		if(x != 0 || y != 0 || r != 0) {
-			grabbingStack = false;
+		switch(driveMode) {
+			
+			case NORMAL:
+				
+				//Get the joystick values.
+				 x = gamepad1.left_stick_x;
+				 y = gamepad1.left_stick_y;
+				 r = gamepad1.right_stick_x;
+				
+				if (x != 0 || y != 0 || r != 0) {
+					grabbingStack = false;
+				}
+				
+				telemetry.addData("X", x);
+				telemetry.addData("Y", y);
+				telemetry.addData("R", r);
+				
+				if (!grabbingStack) {
+					//Drive the motors in robot-centric mode.
+					frontLeft.setPower(Range.clip(y - x - r, -1, 1));
+					backLeft.setPower(Range.clip(y + x - r, -1, 1));
+					frontRight.setPower(Range.clip(y + x + r, -1, 1));
+					backRight.setPower(Range.clip(y - x + r, -1, 1));
+				}
+				
+				if(driveSwitch && !driveSwitchLast) {
+				
+					driveMode = DriveMode.CURVE;
+				
+				}
+				
+			break;
+			
+			case CURVE:
+				
+				//Get the joystick values.
+				x = gamepad1.left_stick_x;
+				y = gamepad1.left_stick_y;
+				r = gamepad1.right_stick_x;
+				
+				x = x * x * getSign(x);
+				y = y * y* getSign(y);
+				r = r * r* getSign(r);
+				
+				telemetry.addData("X", x);
+				telemetry.addData("Y", y);
+				telemetry.addData("R", r);
+				
+				if (x != 0 || y != 0 || r != 0) {
+					grabbingStack = false;
+				}
+				
+				if (!grabbingStack) {
+					//Drive the motors in robot-centric mode.
+					frontLeft.setPower(Range.clip(y - x - r, -1, 1));
+					backLeft.setPower(Range.clip(y + x - r, -1, 1));
+					frontRight.setPower(Range.clip(y + x + r, -1, 1));
+					backRight.setPower(Range.clip(y - x + r, -1, 1));
+				}
+				
+				if(driveSwitch && !driveSwitchLast) {
+					
+					driveMode = DriveMode.NORMAL;
+					
+				}
+				
+				break;
+			
 		}
 		
-		telemetry.addData("X", x);
-		telemetry.addData("Y", y);
-		telemetry.addData("R", r);
+		telemetry.addData("Drive Mode", driveMode);
 		
-		if(!grabbingStack) {
-			//Drive the motors in robot-centric mode.
-			frontLeft.setPower(Range.clip(y - x - r, -1, 1));
-			backLeft.setPower(Range.clip(y + x - r, -1, 1));
-			frontRight.setPower(Range.clip(y + x + r, -1, 1));
-			backRight.setPower(Range.clip(y - x + r, -1, 1));
+	}
+	
+	private int getSign(double value)
+	{
+		
+		if(value >= 0)
+		{
+			return 1;
+		}
+		else
+		{
+			return -1;
 		}
 		
 	}
