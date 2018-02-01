@@ -159,6 +159,8 @@ public class TeleOp_v3 extends OpMode {
 		
 	}
 	
+	private Servo knockerOffer;
+	
 	@Override
 	public void init() {
 		
@@ -171,7 +173,8 @@ public class TeleOp_v3 extends OpMode {
 		setupGripper();
 		telemetry.addLine("Gripper ready.");
 		
-		hardwareMap.servo.get("knockerOffer").setPosition(Double.parseDouble(calibrationManager.get("knockerOfferRaised")));
+		knockerOffer = hardwareMap.servo.get("knockerOffer");
+		knockerOffer.setPosition(Double.parseDouble(calibrationManager.get("knockerOfferRaised")));
 		telemetry.addLine("Knocker offer position set.");
 		
 		setUpExtender();
@@ -184,6 +187,7 @@ public class TeleOp_v3 extends OpMode {
 	@Override
 	public void loop() {
 		
+		knockerOffer.setPosition(Double.parseDouble(calibrationManager.get("knockerOfferRaised")));
 		
 		drive();
 		runLift();
@@ -494,12 +498,12 @@ public class TeleOp_v3 extends OpMode {
 	private void runGripper() {
 		
 		if(gamepad1.a || gamepad1.b || gamepad1.x || gamepad1.y ||
-				gamepad2.a || gamepad2.b || gamepad2.x || gamepad2.y) {
+				/*gamepad2.a || */gamepad2.b || gamepad2.x || gamepad2.y) {
 			grabbingStack = false;
 		}
 		
 		// --- Lower gripper ---
-		if((gamepad1.a || gamepad2.a) && !gripperPressedLast) {
+		if((gamepad1.a/* || gamepad2.a*/) && !gripperPressedLast) {
 			gripperOn = !gripperOn;
 		}
 		
@@ -511,7 +515,7 @@ public class TeleOp_v3 extends OpMode {
 			rightGripper.setPosition(rServoOpen);
 		}
 		
-		gripperPressedLast = gamepad1.a || gamepad2.a;
+		gripperPressedLast = gamepad1.a/* || gamepad2.a*/;
 		// ---------------------
 		
 		
@@ -557,7 +561,7 @@ public class TeleOp_v3 extends OpMode {
 			wrist.setPosition(0);
 		}
 		
-		if(gamepad2.dpad_down && !clawLast) {
+		if((gamepad2.dpad_down || gamepad2.a) && !clawLast) {
 			clawUp = !clawUp;
 		}
 		if(clawUp) {
@@ -567,7 +571,7 @@ public class TeleOp_v3 extends OpMode {
 		}
 		
 		wristLast = gamepad2.dpad_up;
-		clawLast = gamepad2.dpad_down;
+		clawLast = gamepad2.dpad_down || gamepad2.a;
 		
 	}
 	
