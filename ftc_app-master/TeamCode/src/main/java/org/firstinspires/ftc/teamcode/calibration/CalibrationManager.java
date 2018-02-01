@@ -17,7 +17,7 @@ import java.util.Map;
 public class CalibrationManager {
 	
 	//File path to the calibration file.
-	private final static String CALIBRATION_FILE_PATH = "/sdcard/FIRST/Calibration.txt";
+	private String calibrationFilePath;
 	
 	private HashMap<String, String> data;
 	
@@ -30,6 +30,16 @@ public class CalibrationManager {
 		
 		this.telemetry = telemetry;
 		data = new HashMap<String, String>();
+		 calibrationFilePath = "/sdcard/FIRST/Calibration.txt";
+		loadData();
+		
+	}
+	
+	public CalibrationManager(Telemetry telemetry, String filename) {
+		
+		this.telemetry = telemetry;
+		data = new HashMap<String, String>();
+		calibrationFilePath = "/sdcard/FIRST/" + filename + ".txt";
 		loadData();
 		
 	}
@@ -43,7 +53,7 @@ public class CalibrationManager {
 		try {
 			
 			//Open the file.
-			FileInputStream filein = new FileInputStream(CALIBRATION_FILE_PATH);
+			FileInputStream filein = new FileInputStream(calibrationFilePath);
 			String allData = "";
 			
 			//Read all the data from the file.
@@ -85,7 +95,7 @@ public class CalibrationManager {
 		} catch (FileNotFoundException ex) {
 			
 			try {
-				new FileOutputStream(CALIBRATION_FILE_PATH, false).close();
+				new FileOutputStream(calibrationFilePath, false).close();
 			} catch(FileNotFoundException e) {
 				telemetry.addLine("New file could not be created.");
 			} catch(IOException e) {
@@ -130,7 +140,7 @@ public class CalibrationManager {
 		try {
 			
 			
-			FileOutputStream fileout = new FileOutputStream(CALIBRATION_FILE_PATH);
+			FileOutputStream fileout = new FileOutputStream(calibrationFilePath);
 			String dataToBeWritten = "";
 			for(Map.Entry entry : data.entrySet()) {
 				

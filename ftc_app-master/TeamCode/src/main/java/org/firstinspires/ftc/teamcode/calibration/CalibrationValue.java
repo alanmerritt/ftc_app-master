@@ -38,6 +38,10 @@ public abstract class CalibrationValue {
 		
 	}
 	
+	public String getValueName() {
+		return valueName;
+	}
+	
 	/**
 	 * User implementation to save a calibration value.
 	 */
@@ -100,6 +104,8 @@ public abstract class CalibrationValue {
 			aPressedLast = aPressedFirst;
 			upPressedLast = upPressedFirst;
 			downPressedLast = downPressedFirst;
+			
+			
 			
 		}
 		
