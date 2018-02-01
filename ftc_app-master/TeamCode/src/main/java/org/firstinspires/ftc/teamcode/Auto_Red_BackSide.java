@@ -13,7 +13,7 @@ public class Auto_Red_BackSide extends Auto {
 	@Override
 	public void runOpMode() throws InterruptedException {
 		
-		initialize();
+		initialize("RedBacksideCalibration");
 		
 		relicTrackables.activate();
 		
@@ -29,12 +29,20 @@ public class Auto_Red_BackSide extends Auto {
 		
 		//moveToFirstColumn();
 		firstMove();
+		
+		maintainHeight();
 		sleep(500);
+		maintainHeight();
+		
 		//Move to the side depending on which VuMark is seen.
 		moveToSide();
+		
+		maintainHeight();
 		sleep(500);
+		maintainHeight();
+		
 		moveForwardToColumn();
-		sleep(500);
+		
 		lowerAndRelease();
 		
 		backup();
@@ -47,10 +55,12 @@ public class Auto_Red_BackSide extends Auto {
 	
 	private void firstMove() {
 		
+		int dist = (int)Double.parseDouble(specificManager.get("DriveOffPlatformDistance"));
+		
 		//Forward movement.
 		setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 		setModes(DcMotor.RunMode.RUN_TO_POSITION);
-		setTargets(18 * INCH);
+		setTargets(dist * INCH); //18
 		driveMotors(.5, .5, .5, .5);
 		while(frontLeft.isBusy() && !isStopRequested());
 		stopDriveMotors();
@@ -63,14 +73,14 @@ public class Auto_Red_BackSide extends Auto {
 		switch(vuMark) {
 			
 			case LEFT:
-				driveDistance = 24;
+				driveDistance = (int)Double.parseDouble(specificManager.get("LeftColDistance")); //24
 				break;
 			case CENTER:
-				driveDistance = 12;
+				driveDistance = (int)Double.parseDouble(specificManager.get("CenterColDistance")); //12
 				break;
 			case RIGHT:
 			default:
-				driveDistance = 5;
+				driveDistance = (int)Double.parseDouble(specificManager.get("RightColDistance")); //5
 			
 		}
 		
@@ -88,10 +98,12 @@ public class Auto_Red_BackSide extends Auto {
 	
 	private void moveForwardToColumn() {
 		
+		int dist = (int)Double.parseDouble(specificManager.get("DriveToBoxDistance"));
+		
 		//Forward movement.
 		setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 		setModes(DcMotor.RunMode.RUN_TO_POSITION);
-		setTargets(9 * INCH);
+		setTargets(dist * INCH); //9
 		driveMotors(.5, .5, .5, .5);
 		while(frontLeft.isBusy() && !isStopRequested());
 		stopDriveMotors();

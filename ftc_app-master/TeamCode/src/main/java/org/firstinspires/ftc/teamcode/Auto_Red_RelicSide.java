@@ -12,7 +12,7 @@ public class Auto_Red_RelicSide extends Auto {
 	@Override
 	public void runOpMode() throws InterruptedException {
 		
-		initialize();
+		initialize("RedRelicsideCalibration");
 		
 		relicTrackables.activate();
 		
@@ -28,17 +28,26 @@ public class Auto_Red_RelicSide extends Auto {
 		
 		// --- Place glyph. ---
 		
+		maintainHeight();
+		sleep(500);
+		leftLift.setPower(0);
+		rightLift.setPower(0);
+		
 		moveForward();
 		
 		sleep(500);
 		
 		rotate();
 		
+		maintainHeight();
 		sleep(500);
+		maintainHeight();
 		
 		moveToSide();
 		
+		maintainHeight();
 		sleep(500);
+		maintainHeight();
 		
 		moveForwardToColumn();
 		
@@ -54,9 +63,11 @@ public class Auto_Red_RelicSide extends Auto {
 	
 	private void moveForward() {
 		
+		int dist = (int)Double.parseDouble(specificManager.get("DriveOffPlatformDistance"));
+		
 		setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 		setModes(DcMotor.RunMode.RUN_TO_POSITION);
-		setTargets(22 * INCH);
+		setTargets(dist * INCH); //22
 		driveMotors(.5, .5, .5, .5);
 		while(frontLeft.isBusy() && !isStopRequested());
 		stopDriveMotors();
@@ -65,9 +76,11 @@ public class Auto_Red_RelicSide extends Auto {
 	
 	private void rotate() {
 		
+		int rot = (int)Double.parseDouble(specificManager.get("RotationValue"));
+		
 		setModes(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 		double yaw = gyro.getTotalYaw();
-		while(yaw > -85 && !isStopRequested()) {
+		while(yaw > rot && !isStopRequested()) { //-85
 			gyro.updateYaw();
 			yaw = gyro.getTotalYaw();
 			driveMotors(.3, -.3, -.3, .3);
@@ -82,14 +95,14 @@ public class Auto_Red_RelicSide extends Auto {
 		switch(vuMark) {
 			
 			case LEFT:
-				driveDistance = 14;
+				driveDistance = (int)Double.parseDouble(specificManager.get("LeftColDistance")); //14
 				break;
 			case CENTER:
-				driveDistance = 5;
+				driveDistance = (int)Double.parseDouble(specificManager.get("CenterColDistance")); //5
 				break;
 			case RIGHT:
 			default:
-				driveDistance = -3;
+				driveDistance = (int)Double.parseDouble(specificManager.get("RightColDistance")); //3
 			
 		}
 		
@@ -107,10 +120,12 @@ public class Auto_Red_RelicSide extends Auto {
 	
 	private void moveForwardToColumn() {
 		
+		int dist = (int)Double.parseDouble(specificManager.get("DriveToBoxDistance"));
+		
 		//Forward movement.
 		setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 		setModes(DcMotor.RunMode.RUN_TO_POSITION);
-		setTargets(8 * INCH);
+		setTargets(dist * INCH); //8
 		driveMotors(.5, .5, .5, .5);
 		while(frontLeft.isBusy() && !isStopRequested());
 		stopDriveMotors();

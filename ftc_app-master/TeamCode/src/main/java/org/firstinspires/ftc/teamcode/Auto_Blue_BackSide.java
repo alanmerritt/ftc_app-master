@@ -12,7 +12,7 @@ public class Auto_Blue_BackSide extends Auto {
 	public void runOpMode() throws InterruptedException {
 		
 		
-		initialize();
+		initialize("BlueBacksideCalibration");
 		
 		relicTrackables.activate();
 		
@@ -24,15 +24,20 @@ public class Auto_Blue_BackSide extends Auto {
 		
 		blueKnockOff();
 		
+		quickRaise();
+		
 		moveForward();
-		sleep(500);
+//		sleep(500);
+		quickRaise();
 		
 		rotate();
-		sleep(500);
+//		sleep(500);
+		quickRaise();
 		
 		moveToSide();
 		
-		sleep(500);
+//		sleep(500);
+		quickRaise();
 		
 		moveForwardToColumn();
 		
@@ -51,10 +56,12 @@ public class Auto_Blue_BackSide extends Auto {
 	
 	private void moveForward() {
 		
+		int dist = (int)Double.parseDouble(specificManager.get("DriveOffPlatformDistance"));
+		
 		//Forward movement.
 		setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 		setModes(DcMotor.RunMode.RUN_TO_POSITION);
-		setTargets(-23 * INCH);
+		setTargets(-dist * INCH); //23
 		driveMotors(.5, .5, .5, .5);
 		while(frontLeft.isBusy() && !isStopRequested());
 		stopDriveMotors();
@@ -63,9 +70,11 @@ public class Auto_Blue_BackSide extends Auto {
 	
 	private void rotate() {
 		
+		double rot = Double.parseDouble(specificManager.get("RotationValue"));
+		
 		setModes(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 		double yaw = gyro.getTotalYaw();
-		while(yaw > -175 && !isStopRequested()) {
+		while(yaw > -rot && !isStopRequested()) { //175
 			gyro.updateYaw();
 			yaw = gyro.getTotalYaw();
 			driveMotors(.3, -.3, -.3, .3);
@@ -80,14 +89,14 @@ public class Auto_Blue_BackSide extends Auto {
 		switch(vuMark) {
 			
 			case RIGHT:
-				driveDistance = 25; //TODO:Move forward more.
+				driveDistance = (int)Double.parseDouble(specificManager.get("RightColDistance")); //24
 				break;
 			case CENTER:
-				driveDistance = 16;
+				driveDistance = (int)Double.parseDouble(specificManager.get("CenterColDistance")); //16
 				break;
 			case LEFT:
 			default:
-				driveDistance = 8;
+				driveDistance = (int)Double.parseDouble(specificManager.get("LeftColDistance")); //8
 			
 		}
 		
@@ -105,10 +114,12 @@ public class Auto_Blue_BackSide extends Auto {
 	
 	private void moveForwardToColumn() {
 		
+		int dist = (int)Double.parseDouble(specificManager.get("DriveToBoxDistance"));
+		
 		//Forward movement.
 		setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 		setModes(DcMotor.RunMode.RUN_TO_POSITION);
-		setTargets(9 * INCH);
+		setTargets(dist * INCH); //9
 		driveMotors(.5, .5, .5, .5);
 		while(frontLeft.isBusy() && !isStopRequested());
 		stopDriveMotors();

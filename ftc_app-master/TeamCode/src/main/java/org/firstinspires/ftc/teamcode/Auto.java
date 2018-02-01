@@ -61,9 +61,10 @@ public abstract class Auto extends LinearOpMode {
 	double knockerOfferRaised;
 	double knockerOfferLowered;
 	
-	final int LIFT_RAISE_POSITION = (1120/3)*2;
+	final int LIFT_RAISE_POSITION = 1120;
 	
-	CalibrationManager calibrationManager = new CalibrationManager(telemetry);
+	private CalibrationManager generalManager = new CalibrationManager(telemetry);
+	protected CalibrationManager specificManager;
 	
 	ColorSensor colorSensor;
 	
@@ -94,7 +95,7 @@ public abstract class Auto extends LinearOpMode {
 		leftLift = hardwareMap.dcMotor.get("leftLift");
 		
 		//Reverse one of the lift motors.
-		rightLift.setDirection(DcMotorSimple.Direction.REVERSE);
+		leftLift.setDirection(DcMotorSimple.Direction.REVERSE);
 		
 		//Set the lift motors to brake mode.
 		leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -111,24 +112,24 @@ public abstract class Auto extends LinearOpMode {
 		upperLeftGripper = hardwareMap.servo.get("upperLeftGripper");
 		
 		//Get the lower servo open/close values.
-		lServoOpen = Double.parseDouble(calibrationManager.get("lServoOpen"));
-		lServoClose = Double.parseDouble(calibrationManager.get("lServoClose"));
-		rServoOpen = Double.parseDouble(calibrationManager.get("rServoOpen"));
-		rServoClose = Double.parseDouble(calibrationManager.get("rServoClose"));
+		lServoOpen = Double.parseDouble(generalManager.get("lServoOpen"));
+		lServoClose = Double.parseDouble(generalManager.get("lServoClose"));
+		rServoOpen = Double.parseDouble(generalManager.get("rServoOpen"));
+		rServoClose = Double.parseDouble(generalManager.get("rServoClose"));
 		
 		//Get the upper servo open/close values.
-		ulServoOpen = Double.parseDouble(calibrationManager.get("upperlServoOpen"));
-		ulServoClose = Double.parseDouble(calibrationManager.get("upperlServoClose"));
-		urServoOpen = Double.parseDouble(calibrationManager.get("upperrServoOpen"));
-		urServoClose = Double.parseDouble(calibrationManager.get("upperrServoClose"));
+		ulServoOpen = Double.parseDouble(generalManager.get("upperlServoOpen"));
+		ulServoClose = Double.parseDouble(generalManager.get("upperlServoClose"));
+		urServoOpen = Double.parseDouble(generalManager.get("upperrServoOpen"));
+		urServoClose = Double.parseDouble(generalManager.get("upperrServoClose"));
 		
 	}
 	
 	private void setupKnockerOffer() {
 		
 		knockerOffer = hardwareMap.servo.get("knockerOffer");
-		knockerOfferRaised = Double.parseDouble(calibrationManager.get("knockerOfferRaised"));
-		knockerOfferLowered = Double.parseDouble(calibrationManager.get("knockerOfferLowered"));
+		knockerOfferRaised = Double.parseDouble(generalManager.get("knockerOfferRaised"));
+		knockerOfferLowered = Double.parseDouble(generalManager.get("knockerOfferLowered"));
 		
 		//Initialize knocker-offer to raised position.
 		knockerOffer.setPosition(knockerOfferRaised);
@@ -290,6 +291,16 @@ public abstract class Auto extends LinearOpMode {
 		
 	}
 	
+	
+	protected void initialize(String managerName) {
+		
+		specificManager = new CalibrationManager(telemetry, managerName);
+		
+		initialize();
+		
+	}
+	
+	
 	protected void driveMotors(double fl, double fr, double br, double bl) {
 		
 		frontLeft.setPower(fl);
@@ -330,6 +341,27 @@ public abstract class Auto extends LinearOpMode {
 		leftLift.setPower(.4);
 		rightLift.setPower(.4);
 		while(leftLift.getCurrentPosition() < LIFT_RAISE_POSITION && !isStopRequested());
+		leftLift.setPower(0);
+		rightLift.setPower(0);
+		
+	}
+	
+	protected void maintainHeight() {
+	
+		if(leftLift.getCurrentPosition() < LIFT_RAISE_POSITION) {
+			leftLift.setPower(.4);
+			rightLift.setPower(.4);
+		} else {
+			leftLift.setPower(0);
+			rightLift.setPower(0);
+		}
+	
+	}
+	
+	protected void quickRaise() {
+		
+		maintainHeight();
+		sleep(600);
 		leftLift.setPower(0);
 		rightLift.setPower(0);
 		
