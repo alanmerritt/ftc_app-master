@@ -14,6 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.calibration.CalibrationManager;
 
+import java.lang.annotation.Target;
 import java.util.ArrayList;
 
 /**
@@ -138,6 +139,11 @@ public abstract class Auto extends LinearOpMode {
 		
 	}
 	
+	protected Servo wrist;
+	private void setUpExtender() {
+		wrist = hardwareMap.servo.get("wrist");
+		wrist.setPosition(0);
+	}
 	
 	protected ArrayList<String> messages;
 	
@@ -284,7 +290,7 @@ public abstract class Auto extends LinearOpMode {
 		messages.add("Vuforia setup complete.");
 		writeMessages();
 		
-		
+		setUpExtender();
 		
 		messages.add("Initialization complete.");
 		writeMessages();
@@ -361,7 +367,7 @@ public abstract class Auto extends LinearOpMode {
 	protected void quickRaise() {
 		
 		maintainHeight();
-		sleep(600);
+		sleep(700);
 		leftLift.setPower(0);
 		rightLift.setPower(0);
 		
@@ -378,11 +384,13 @@ public abstract class Auto extends LinearOpMode {
 		leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 		leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 		
-		leftLift.setPower(-.1);
-		rightLift.setPower(-.1);
+		leftLift.setPower(-.05);
+		rightLift.setPower(-.05);
 		while(leftLift.getCurrentPosition() > -LIFT_RAISE_POSITION && !isStopRequested());
 		leftLift.setPower(0);
 		rightLift.setPower(0);
+		
+		wrist.setPosition(1);
 		
 		backup(4);
 		
@@ -406,13 +414,16 @@ public abstract class Auto extends LinearOpMode {
 		driveMotors(power, power, power, power);
 	}
 	
-	final double PLATFORM_MOVEMENT_SPEED = .15;
+	final double PLATFORM_MOVEMENT_SPEED = .1
+			;
 	
 	/**
 	 * Used in red autonomous.
 	 * Knocks off the blue ball.
 	 */
 	protected void redKnockOff() {
+		
+		final int TARGET = 1120/5;
 		
 		knockerOffer.setPosition(knockerOfferLowered);
 		
@@ -429,7 +440,7 @@ public abstract class Auto extends LinearOpMode {
 			setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 			setModes(DcMotor.RunMode.RUN_TO_POSITION);
 			
-			setTargets(1120/4);
+			setTargets(TARGET);
 			while(frontLeft.isBusy() && !isStopRequested()) {
 				driveForwardBackward(PLATFORM_MOVEMENT_SPEED);
 			}
@@ -449,7 +460,7 @@ public abstract class Auto extends LinearOpMode {
 			//Drive backward, then move back forward.
 			setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 			setModes(DcMotor.RunMode.RUN_TO_POSITION);
-			setTargets(-1120/4);
+			setTargets(-TARGET);
 			while(frontLeft.isBusy() && !isStopRequested()) {
 				driveForwardBackward(-PLATFORM_MOVEMENT_SPEED);
 			}
@@ -463,7 +474,7 @@ public abstract class Auto extends LinearOpMode {
 			
 			setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 			setModes(DcMotor.RunMode.RUN_TO_POSITION);
-			setTargets(1120/2);
+			setTargets(TARGET*2);
 			while(frontLeft.isBusy() && !isStopRequested()) {
 				driveForwardBackward(PLATFORM_MOVEMENT_SPEED);
 			}
@@ -484,6 +495,8 @@ public abstract class Auto extends LinearOpMode {
 	 */
 	protected void blueKnockOff() {
 		
+		final int TARGET = 1120/5;
+		
 		knockerOffer.setPosition(knockerOfferLowered);
 		
 		sleep(1000);
@@ -497,7 +510,7 @@ public abstract class Auto extends LinearOpMode {
 			//Drive forward.
 			setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 			setModes(DcMotor.RunMode.RUN_TO_POSITION);
-			setTargets(-1120/4);
+			setTargets(-TARGET);
 			while(frontLeft.isBusy() && !isStopRequested()) {
 				driveForwardBackward(-PLATFORM_MOVEMENT_SPEED);
 			}
@@ -516,7 +529,7 @@ public abstract class Auto extends LinearOpMode {
 			//Drive backward, then move back forward.
 			setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 			setModes(DcMotor.RunMode.RUN_TO_POSITION);
-			setTargets(1120/4);
+			setTargets(TARGET);
 			while(frontLeft.isBusy() && !isStopRequested()) {
 				driveForwardBackward(PLATFORM_MOVEMENT_SPEED);
 			}
@@ -530,7 +543,7 @@ public abstract class Auto extends LinearOpMode {
 			
 			setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 			setModes(DcMotor.RunMode.RUN_TO_POSITION);
-			setTargets(-1120/2);
+			setTargets(-TARGET*2);
 			while(frontLeft.isBusy() && !isStopRequested()) {
 				driveForwardBackward(-PLATFORM_MOVEMENT_SPEED);
 			}
@@ -560,7 +573,7 @@ public abstract class Auto extends LinearOpMode {
 	@Deprecated
 	void backup() {
 		
-		backup(-5);
+		backup(-6);
 		
 	}
 	
@@ -575,5 +588,7 @@ public abstract class Auto extends LinearOpMode {
 		telemetry.update();
 		
 	}
+	
+	
 	
 }
