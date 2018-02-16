@@ -153,7 +153,7 @@ public class TeleOp_v3 extends OpMode {
 		claw = hardwareMap.servo.get("claw");
 		
 		wristLast = false;
-		wristUp = false;
+		wristUp = true;
 		clawLast = false;
 		clawUp = false;
 		
