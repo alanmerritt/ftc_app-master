@@ -27,16 +27,18 @@ public class Auto_Red_Backside_Calibration extends Auto_Calibration {
 	@Override
 	void addCalibrationValues(ArrayList<CalibrationValue> list) {
 		
+		final double valueChange = .5;
+		
 		//Distance to drive off the platform.
 		list.add(new CalibrationValue(gamepad1, "DriveOffPlatformDistance") {
 			@Override
 			protected void changeValue() {
 				
 				if(upButtonClicked() && value <= 40) {
-					value += 1;
+					value += valueChange;
 				}
 				if(downButtonClicked() && value >= 0) {
-					value -= 1;
+					value -= valueChange;
 				}
 				
 				telemetry.addLine("Distance to drive off platform.");
@@ -55,10 +57,10 @@ public class Auto_Red_Backside_Calibration extends Auto_Calibration {
 			protected void changeValue() {
 				
 				if(upButtonClicked() && value <= 40) {
-					value += 1;
+					value += valueChange;
 				}
 				if(downButtonClicked() && value >= 0) {
-					value -= 1;
+					value -= valueChange;
 				}
 				
 				telemetry.addLine("Distance to the left column.");
@@ -77,10 +79,10 @@ public class Auto_Red_Backside_Calibration extends Auto_Calibration {
 			protected void changeValue() {
 				
 				if(upButtonClicked() && value <= 40) {
-					value += 1;
+					value += valueChange;
 				}
 				if(downButtonClicked() && value >= 0) {
-					value -= 1;
+					value -= valueChange;
 				}
 				
 				telemetry.addLine("Distance to center column.");
@@ -98,10 +100,10 @@ public class Auto_Red_Backside_Calibration extends Auto_Calibration {
 			protected void changeValue() {
 				
 				if(upButtonClicked() && value <= 40) {
-					value += 1;
+					value += valueChange;
 				}
 				if(downButtonClicked() && value >= 0) {
-					value -= 1;
+					value -= valueChange;
 				}
 				
 				telemetry.addLine("Distance to right column.");
@@ -119,14 +121,34 @@ public class Auto_Red_Backside_Calibration extends Auto_Calibration {
 			protected void changeValue() {
 				
 				if(upButtonClicked() && value <= 20) {
-					value += 1;
+					value += valueChange;
 				}
 				if(downButtonClicked() && value >= 0) {
-					value -= 1;
+					value -= valueChange;
 				}
 				
 				telemetry.addLine("Distance to the box.");
 				telemetry.addData("Distance", value);
+				telemetry.addLine();
+				telemetry.addLine("Press A to continue.");
+				
+				telemetry.update();
+			}
+		});
+		
+		list.add(new CalibrationValue(gamepad1, "FaceRelicRotation") {
+			@Override
+			protected void changeValue() {
+				
+				if(upButtonClicked() && value <= 180) {
+					value += valueChange;
+				}
+				if(downButtonClicked() && value >= -180) {
+					value -= valueChange;
+				}
+				
+				telemetry.addLine("Face relic rotation.");
+				telemetry.addData("Rotation", value);
 				telemetry.addLine();
 				telemetry.addLine("Press A to continue.");
 				
