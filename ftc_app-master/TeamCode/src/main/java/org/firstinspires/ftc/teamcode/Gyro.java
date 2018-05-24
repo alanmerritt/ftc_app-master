@@ -14,10 +14,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
  * Class used for easily accessing the imu
  * builtin to the Rev Expansion Hub.
  *
+ * It also provides a method that returns the total
+ * rotation of the robot, which makes it easy to
+ * rotate the robot past 180 or -180.
+ *
  * It assumes that the imu is named "imu" in
  * the robot configuration file.
  */
-
 public class Gyro {
 
     BNO055IMU imu;
@@ -25,6 +28,10 @@ public class Gyro {
 	private double totalYaw = 0;
 	private double lastYaw = 0;
 	
+	/**
+	 * Initializes the gyroscope.
+	 * @param opMode The opmode, needed for hardware mapping.
+	 */
     public Gyro(OpMode opMode) {
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -51,35 +58,53 @@ public class Gyro {
     }
 	
 	/**
-	 *
-	 * @return
+	 * Gets the yaw value straight from the gyroscope.
+	 * @return The yaw value.
 	 */
 	public double getYaw() {
 	    
 	    return getOrientation().firstAngle;
 	    
     }
-    
-    public void updateYaw() {
-	    
+	
+	/**
+	 * This updates the yaw value for the total rotation.
+	 * It <i><b>MUST</b></i> run whenever the robot is turning so
+	 * that the value can update properly.
+	 */
+	public void updateYaw() {
+	 
+		//Get the yaw directly from the gyroscope.
 	    double yaw = getYaw();
 	    
+	    //Get the difference between the current yaw value and the previous one.
 	    double diff = yaw - lastYaw;
 	    
+	    //If the difference is greater than 180, it means that it has jumped from negative
+		//to positive, so subtract 360 to find the actual difference.
 	    if(diff >= 180) {
 		    diff -= 360;
 	    }
+		//Likewise, if the difference is less than -180, it means that it has jumped from positive
+		//to negative, so add 360 to find the actual difference.
 	    if(diff < -180) {
 		    diff += 360;
 	    }
 	    
+	    //Add the difference to the total yaw.
 	    totalYaw += diff;
 	    
+	    //Set the last yaw to the current yaw.
 	    lastYaw = yaw;
 	    
     }
-    
-    public double getTotalYaw() {
+	
+	/**
+	 * Gets the total yaw. While the gyroscope returns a value from -180 to 180,
+	 * this will return the total amount that the robot has rotated.
+	 * @return The total yaw value.
+	 */
+	public double getTotalYaw() {
 	    
 	    return totalYaw;
 	    

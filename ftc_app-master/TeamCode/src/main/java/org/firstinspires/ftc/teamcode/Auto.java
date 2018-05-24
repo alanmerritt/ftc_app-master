@@ -427,7 +427,9 @@ public abstract class Auto extends LinearOpMode {
 		
 		knockerOffer.setPosition(knockerOfferLowered);
 		
-		sleep(1000);
+		scanVuMark(1000);
+		
+		sleep(500);
 		
 		telemetry.addData("Blue", colorSensor.blue());
 		telemetry.addData("Red", colorSensor.red());
@@ -436,11 +438,14 @@ public abstract class Auto extends LinearOpMode {
 		if(colorSensor.blue() > colorSensor.red()) {
 			//If blue is seen, drive directly off the block toward the back side of the field.
 			
-			//Drive forward.
+			//Set modes.
 			setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 			setModes(DcMotor.RunMode.RUN_TO_POSITION);
 			
+			//Set targets.
 			setTargets(TARGET);
+			
+			//Drive forward.
 			while(frontLeft.isBusy() && !isStopRequested()) {
 				driveForwardBackward(PLATFORM_MOVEMENT_SPEED);
 			}
@@ -499,7 +504,9 @@ public abstract class Auto extends LinearOpMode {
 		
 		knockerOffer.setPosition(knockerOfferLowered);
 		
-		sleep(1000);
+		scanVuMark(1000);
+		
+		sleep(500);
 		
 		telemetry.addData("Blue", colorSensor.blue());
 		telemetry.addData("Red", colorSensor.red());
